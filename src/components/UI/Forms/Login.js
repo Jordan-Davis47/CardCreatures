@@ -22,7 +22,7 @@ const Login = (props) => {
 
 	const submitHandler = async (setSubmitting, values) => {
 		try {
-			const response = await sendRequest("https://cardcreatures-backend/api/users/login", "post", values, { "Content-type": "application/json" });
+			const response = await sendRequest("https://cardcreatures-backend.vercel.app/api/users/login", "post", values, { "Content-type": "application/json" });
 			console.log(response);
 			setSubmitting(false);
 
