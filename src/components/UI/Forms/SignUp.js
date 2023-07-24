@@ -57,7 +57,7 @@ const SignUp = (props) => {
 						<ErrorMessage name="email" />
 					</div>
 					<div className={classes.formControl}>
-						<Field className={classes.input} name="password" type="text" />
+						<Field className={classes.input} name="password" type="password" />
 						<label htmlFor="password">Password</label>
 						<ErrorMessage name="password" />
 					</div>

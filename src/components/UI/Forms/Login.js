@@ -22,7 +22,7 @@ const Login = (props) => {
 
 	const submitHandler = async (setSubmitting, values) => {
 		try {
-			const response = await sendRequest("http://cardcreatures-backend/api/users/login", "post", values, { "Content-type": "application/json" });
+			const response = await sendRequest("https://cardcreatures-backend/api/users/login", "post", values, { "Content-type": "application/json" });
 			console.log(response);
 			setSubmitting(false);
 
@@ -55,7 +55,7 @@ const Login = (props) => {
 						<ErrorMessage name="email" />
 					</div>
 					<div className={classes.formControl}>
-						<Field className={classes.input} name="password" type="text" />
+						<Field className={classes.input} name="password" type="password" />
 						<label htmlFor="password">Password</label>
 						<ErrorMessage name="password" />
 					</div>
