@@ -31,7 +31,7 @@ const Login = (props) => {
 			console.log(auth.isLoggedIn);
 			closeForm();
 		} catch (err) {
-			console.log(err, "errrrrorr");
+			console.log(err);
 			//error handling in request function//
 		}
 	};
