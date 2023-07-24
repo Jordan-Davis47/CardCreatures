@@ -8,22 +8,15 @@ import Card from "../Card";
 const TributeDisplay = (props) => {
 	const tributes = useSelector((state) => state.player.tributes);
 
-	const tributeCards = [];
-	if (tributes.length) {
-		tributes.forEach((arr) => {
-			const card = arr[0];
-			tributeCards.push(card);
-		});
-	}
-	console.log(tributeCards);
+	console.log(tributes);
 
 	return (
-		<Modal onClose={props.onClose}>
+		<Modal onClose={props.onClose} onCancel={props.onCancel}>
 			<div className={classes.tributeDisplay}>
 				<p className={classes.headerText}>Would you like to tribute summon?</p>
 				<p>Tribute:</p>
 				<div className={classes.tributeCardsContainer}>
-					{tributeCards.map((card) => (
+					{tributes.map((card) => (
 						<Card key={card.id} className="tributingCard" name={card.name} atk={card.atk} def={card.def} src={card.img} type={card.type} />
 					))}
 				</div>

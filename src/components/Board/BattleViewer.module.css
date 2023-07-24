@@ -1,0 +1,11 @@
+.container {
+	width: 80vw;
+	height: 50vh;
+	max-width: 750px;
+	max-height: 500px;
+	background-color: black;
+	border: 1px solid goldenrod;
+}
+
+.middleContainer svg {
+}

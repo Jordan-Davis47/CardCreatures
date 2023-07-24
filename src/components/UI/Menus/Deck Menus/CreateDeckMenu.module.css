@@ -1,0 +1,39 @@
+.createDeckContainer {
+	height: 70%;
+	width: 60%;
+	border: 2px solid goldenrod;
+	box-shadow: -2px 2px 5px 1px black;
+	display: flex;
+	/* position: absolute;
+	right: 15%;
+	bottom: 50%; */
+	margin: auto;
+}
+
+.createDeckContainer form {
+	padding: 20px;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-evenly;
+	gap: 15px;
+}
+
+.createDeckContainer form input {
+	height: 15%;
+	max-height: 25px;
+	width: 80%;
+	margin-bottom: 10px;
+}
+
+.createDeckContainer form label {
+	color: white;
+	font-size: 1.2rem;
+}
+
+.createDeckContainer form button {
+	padding: 0;
+	width: 80%;
+	max-width: 100%;
+}

@@ -1,0 +1,122 @@
+.choiceContainer {
+	width: 100%;
+	max-width: 700px;
+	height: fit-content;
+	margin: auto;
+	display: flex;
+	justify-content: space-between;
+	position: absolute;
+	top: 30%;
+	padding: 0 5%;
+	z-index: 1;
+}
+
+.choiceContainerModalView {
+	width: 100%;
+	padding: 0;
+	position: relative;
+	display: flex;
+	justify-content: space-around;
+	margin: 0;
+}
+
+.deckHeader {
+	/* position: absolute; */
+	color: white;
+	margin: auto;
+	text-align: center;
+}
+
+.player1Choice,
+.player2Choice {
+	width: fit-content;
+	height: fit-content;
+	background: rgb(24, 24, 24);
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
+	border: 1px solid goldenrod;
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-transform: capitalize;
+}
+
+.startContainer {
+	background: rgb(24, 24, 24);
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
+	border: 1px goldenrod solid;
+	border-radius: 2px;
+	height: 80vh;
+	width: 70vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	gap: 10%;
+}
+
+.startContainer h1 {
+	color: #ffffff;
+	text-align: center;
+}
+
+.buttonContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+}
+
+.buttonContainer button {
+	height: 35px;
+	width: 80%;
+	max-width: 300px;
+	margin: 0 5%;
+}
+
+.startButton {
+	position: absolute;
+	bottom: 5vh;
+	width: 20vw;
+	min-width: 150px;
+	max-width: 200px;
+	padding: 10px 0;
+	background-color: rgba(0, 0, 0);
+	color: white;
+	font-size: 1rem;
+	border-radius: 5px;
+}
+
+.startButton:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+.startButton:active {
+	transform: scale(0.95);
+}
+
+.backButton {
+	min-width: 150px;
+	max-width: 200px;
+	width: 20vw;
+	height: 5vh;
+	background-color: black;
+	border-radius: 5px;
+	border: 2px solid white;
+	color: white;
+	font-size: 1.2rem;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 10vh;
+	margin: 0 auto;
+}
+
+p {
+	color: white;
+}
+
+.clicked {
+	border-color: red;
+}

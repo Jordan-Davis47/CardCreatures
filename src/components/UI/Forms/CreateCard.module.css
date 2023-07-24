@@ -1,0 +1,34 @@
+.createDeckMenu {
+	width: 100%;
+	height: 100%;
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	position: relative;
+}
+
+.cardDisplaySection {
+	display: none;
+}
+
+.cardFormSection label {
+	color: white;
+}
+
+@media (min-width: 800px) {
+	.cardDisplaySection {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding-top: 5px;
+	}
+
+	.displayCard {
+		position: absolute;
+		right: 5%;
+		width: 30%;
+		height: 50%;
+		max-width: 165px;
+		max-height: 265px;
+	}
+}

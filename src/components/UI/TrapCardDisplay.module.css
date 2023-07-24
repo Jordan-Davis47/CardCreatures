@@ -3,47 +3,98 @@ h3 {
 	margin: 0 auto;
 }
 
-.trapCardsContainer {
+.trapMenu,
+.trapMenu div {
 	display: flex;
+	align-items: center;
+}
+
+.trapMenu {
+	flex-direction: column;
+	justify-content: center;
+	font-size: 1.3rem;
+	border: 1px solid goldenrod;
+	padding: 10%;
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
+	text-align: center;
+}
+
+.trapMenu div {
+	width: 100%;
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.trapMenu div button {
+	width: 40%;
+	background-color: black;
+}
+
+.trapMenu div button:hover {
+	color: goldenrod;
+}
+
+.trapCardsContainer {
+	border: 1px solid goldenrod;
+	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
-	/* border: 2px solid white; */
-	height: 30%;
-	width: 90%;
-	position: absolute;
-	top: 10vh;
-	left: 0;
-	right: 0;
+	height: 70%;
+	width: 100%;
 	margin: 0 auto;
+	padding: 5%;
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
+}
+
+.cardsList {
+	height: 100%;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.cardsList + div {
+	display: flex;
+	justify-content: center;
+}
+
+.cardsList + div button {
+	margin-bottom: 10px;
+	background-color: black;
+}
+
+.activatePrompt {
+	border: 1px solid goldenrod;
+	height: 70%;
+	width: 100%;
+	display: grid;
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
 }
 
 .focusedCardContainer {
-	width: 90%;
+	width: 100%;
+	height: 100%;
+	padding: 2%;
 	display: flex;
-	position: absolute;
-	bottom: 38%;
-	right: 0;
-	left: 0;
-	margin: 0 auto 0;
-	padding-top: 20px;
+	flex-direction: column-reverse;
+	justify-content: center;
+	gap: 10%;
+	align-items: center;
+	margin: 0 auto;
 	color: white;
-	/* justify-content: center; */
 	text-align: center;
-	border-top: 2px solid white;
 }
 
 .buttonContainer {
-	border: 2px solid white;
 	display: flex;
-	/* flex-direction: column; */
 	justify-content: space-around;
 	align-items: center;
+	justify-self: flex-start;
 	width: 90%;
-	height: 100px;
-	position: absolute;
-	bottom: 10%;
-	left: 0;
-	right: 0;
-	margin: auto;
+	margin: 0 auto;
 }
 
 .buttonContainer div:nth-of-type(1),
@@ -56,10 +107,14 @@ h3 {
 	color: white;
 }
 
-.boltIcon {
-	font-size: 3em;
-}
-
+.boltIcon,
 .cancelIcon {
 	font-size: 3em;
+	cursor: pointer;
+	color: white;
+}
+
+.boltIcon:hover,
+.cancelIcon:hover {
+	color: goldenrod;
 }

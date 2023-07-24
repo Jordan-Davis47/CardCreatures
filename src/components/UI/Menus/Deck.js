@@ -1,4 +1,6 @@
-import classes from "./DeckSelectMenu.module.css";
+import { Fragment, useState } from "react";
+
+import classes from "./Deck Menus/DeckSelectMenu.module.css";
 let deckClasses = "";
 const Deck = (props) => {
 	if (props.isClicked) {
@@ -7,7 +9,24 @@ const Deck = (props) => {
 		deckClasses = `${props.className}`;
 	}
 
-	return <div onClick={props.onClick} className={deckClasses}></div>;
+	const clickHandler = () => {
+		props.onClick(props.deckName);
+	};
+
+	const sendDeckIdHandler = () => {
+		props.getDeckId(props.id);
+	};
+
+	const deck = props.listStyle ? (
+		<li onClick={sendDeckIdHandler}>{props.name}</li>
+	) : (
+		<div onClick={props.onClick}>
+			<div onClick={clickHandler} className={deckClasses}></div>
+			<label style={{ color: "white" }}>{props.deckName}</label>
+		</div>
+	);
+
+	return deck;
 };
 
 export default Deck;

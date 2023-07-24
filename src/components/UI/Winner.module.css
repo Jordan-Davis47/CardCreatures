@@ -1,4 +1,21 @@
-.winnerText,
-.winnerText + h3 {
+.container {
+	border: 1px solid goldenrod;
+	box-shadow: 4px 5px 1px 2px black;
 	color: white;
+	width: 500px;
+	height: 500px;
+	background-color: black;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.container ul {
+	list-style: none;
+}
+
+.container h4 {
+	font-size: 1.2rem;
+	margin-bottom: 20px;
 }

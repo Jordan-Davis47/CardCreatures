@@ -1,0 +1,15 @@
+.formControl {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+.formControl label {
+	margin-bottom: 20px;
+}
+
+.formControl select {
+	width: 75px;
+	text-align: center;
+}

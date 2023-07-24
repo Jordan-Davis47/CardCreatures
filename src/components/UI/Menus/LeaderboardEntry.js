@@ -1,7 +1,6 @@
 import React from "react";
 
 const LeaderboardEntry = (props) => {
-	console.log(props);
 	return (
 		<div className={props.className}>
 			<p>#{props.rank}</p>

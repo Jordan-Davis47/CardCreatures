@@ -1,0 +1,55 @@
+.boardContainer {
+	flex-direction: column;
+	align-items: center;
+	width: 15vw;
+	max-width: 300px;
+	height: 60vh;
+	background-color: rgb(0, 0, 0, 0.5);
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: none;
+	z-index: 2;
+}
+
+.boardContainer:hover {
+	opacity: 1;
+}
+
+.inMenuContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	width: 70vw;
+	height: 80vh;
+	border: 1px solid goldenrod;
+	background-color: black;
+	color: white;
+	text-align: center;
+}
+
+.header {
+	margin-bottom: 10px;
+	border-bottom: 2px solid white;
+	color: white;
+	width: 50%;
+	text-align: center;
+}
+
+.inMenuBtn {
+	margin: 0 auto 30px;
+	width: 40%;
+}
+
+.logs {
+	height: 80%;
+	overflow-y: auto;
+	padding: 4%;
+}
+
+@media (min-width: 1200px) {
+	.boardContainer {
+		display: flex;
+	}
+}

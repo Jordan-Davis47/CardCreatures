@@ -9,18 +9,16 @@
 }
 
 .modal,
-.trapPrompt {
+.trapPrompt,
+.responseModal {
 	display: flex;
-	border: 2px solid white;
+	flex-direction: column;
 	position: fixed;
 	left: 0;
 	right: 0;
 	padding: 1rem;
-	border-radius: 14px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 	z-index: 30;
 	animation: slide-down 300ms ease-out forwards;
-	background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 17%, rgba(0, 0, 0, 0.2) 30%, rgba(0, 0, 0, 0.7) 95%);
 }
 
 .modal {
@@ -28,7 +26,21 @@
 	margin: 0 auto;
 	width: 80vw;
 	max-width: 400px;
-	height: 95vh;
+	height: 100vh;
+}
+
+.modalContent {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.modalBorder {
+	border: 2px solid white;
+	border-radius: 14px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+	background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 17%, rgba(0, 0, 0, 0.2) 30%, rgba(0, 0, 0, 0.7) 95%);
 }
 
 .trapPrompt {
@@ -61,6 +73,13 @@
 
 .trapPrompt:active {
 	transform: scale(0.95);
+}
+
+.header {
+	color: white;
+	font-size: 1.4em;
+	display: flex;
+	justify-content: center;
 }
 
 @keyframes slide-down {

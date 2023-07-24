@@ -1,60 +1,50 @@
+import { useState, useEffect } from "react";
+import { useAxios } from "../../../hooks/axios-hook";
+
 import LeaderboardEntry from "./LeaderboardEntry";
 import Button from "../Button";
+import Container from "../Layout/Container";
+import LoadingSpinner from "../LoadingSpinner";
 
 import classes from "./Leaderboard.module.css";
-import { useState, useCallback, useEffect, Fragment } from "react";
+
+const getRankingsUrl = "http://localhost:9000/api/users/leaderboard";
 
 const Leaderboard = (props) => {
+	const { sendRequest, isLoading } = useAxios();
 	const [leaderboardData, setLeaderboardData] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		const fetchLeaderboardData = async () => {
-			const res = await fetch("http://localhost:9000/leaderboard");
-			const data = await res.json();
-
-			const dataToBeSorted = [];
-			for (const key in data) {
-				dataToBeSorted.push({
-					id: key,
-					player: data[key].player,
-					wins: data[key].wins,
-					score: data[key].score,
-				});
-			}
-			const rankings = dataToBeSorted.sort((a, b) => b.score - a.score);
-			console.log("running");
-			setLeaderboardData(rankings);
-			setIsLoading(false);
+		const getLeaderboard = async () => {
+			const response = await sendRequest(getRankingsUrl, "get");
+			console.log(response);
+			setLeaderboardData(response.data);
 		};
-		fetchLeaderboardData();
-	}, []);
-
-	console.log(leaderboardData);
+		getLeaderboard();
+	}, [sendRequest]);
 
 	if (isLoading) {
-		return <section className={classes.spinner}></section>;
+		return <LoadingSpinner />;
 	}
 
 	return (
-		<Fragment>
+		<Container className={classes.leaderboardContainer}>
 			<h1 className={classes.title}>Leaderboard</h1>
 			<div className={classes.leaderboard}>
-				{/* {leaderboardData.map} */}
 				<div className={classes.leaderboardHeader}>
 					<p>Name:</p>
 					<p>Wins:</p>
 					<p>Score:</p>
 				</div>
-				{/* <LeaderboardEntry className={classes.ranking} name={"Jordan"} wins={5} score={4000} /> */}
+
 				{leaderboardData.map((ranking, index) => (
-					<LeaderboardEntry className={classes.ranking} key={index} rank={index + 1} name={ranking.player} wins={ranking.wins} score={ranking.score} />
+					<LeaderboardEntry className={classes.ranking} key={index} rank={index + 1} name={ranking.name} wins={ranking.wins} score={ranking.score} />
 				))}
-				<Button className={classes.backBtn} onClick={props.onClose}>
-					Back
-				</Button>
 			</div>
-		</Fragment>
+			<Button className={classes.backBtn} onClick={props.onClose} backBtn>
+				Back
+			</Button>
+		</Container>
 	);
 };
 

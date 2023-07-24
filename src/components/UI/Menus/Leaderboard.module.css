@@ -1,24 +1,26 @@
+.leaderboardContainer {
+	gap: 5%;
+}
+
 .leaderboard {
 	position: relative;
-	width: 85vw;
-	height: 70vh;
-	border: 2px solid white;
+	width: 90%;
+	height: 95%;
+	border: 2px solid goldenrod;
 	max-width: 900px;
+	margin: auto;
+	overflow-x: auto;
 }
 
 .title {
 	font-family: "My Soul";
 	color: white;
-	position: relative;
-	bottom: 5%;
-	font-size: 3rem;
-	letter-spacing: 3px;
 }
 
 .leaderboardHeader {
 	display: flex;
 	justify-content: space-around;
-	border-bottom: 2px solid white;
+	border-bottom: 2px solid goldenrod;
 }
 
 .ranking {
@@ -26,9 +28,8 @@
 	display: grid;
 	grid-template-columns: 50px 1fr 1fr 1fr;
 	color: white;
-	border-bottom: 2px solid white;
+	border-bottom: 2px solid goldenrod;
 	padding: 5px 10px;
-	/* font-family: "ubuntu"; */
 }
 
 .ranking p {
@@ -47,21 +48,7 @@
 }
 
 .backBtn {
-	position: absolute;
-	width: 70%;
-	max-width: 160px;
-	height: 30px;
-	bottom: -6vh;
-	left: 0;
-	right: 0;
-	margin: auto;
-	border: 2px solid white;
-	border-radius: 8px;
-	background-color: black;
-	color: white;
-	font-family: "ubuntu";
-	font-size: 1.1rem;
-	cursor: pointer;
+	margin-bottom: 20px;
 }
 
 .backBtn:hover {

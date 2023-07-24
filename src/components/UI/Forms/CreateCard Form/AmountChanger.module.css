@@ -1,0 +1,45 @@
+.statChange {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 10%;
+}
+
+.statChange span {
+	color: white;
+	margin: 0 10px;
+	border: white 2px solid;
+	border-radius: 3px;
+	width: 40px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.statChange button {
+	width: 20px;
+	color: white;
+	font-size: 1.7rem;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.statChange button {
+	margin: 0 5px;
+}
+
+.statChange label {
+	color: white;
+}
+
+.statChange div:nth-of-type(1) {
+	display: flex;
+	justify-content: space-around;
+	margin-bottom: 5px;
+}
+
+.statChange div:nth-of-type(2) {
+	display: flex;
+	justify-content: space-between;
+}

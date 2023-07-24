@@ -1,18 +1,22 @@
 import classes from "./Button.module.css";
 
-let buttonClass;
-
 const Button = (props) => {
-	if (props.className === "button") {
+	let buttonClass;
+
+	if (props.menuBtn) {
 		buttonClass = classes.button;
-	} else if (props.className === "backButton") {
-		buttonClass = `${classes.backButton}`;
+	} else if (props.formBtn) {
+		buttonClass = `${classes.formBtn}`;
+	} else if (props.menuButton) {
+		buttonClass = classes.menuButton;
+	} else if (props.backBtn) {
+		buttonClass = classes.backBtn;
 	} else {
 		buttonClass = `${props.className}`;
 	}
 
 	return (
-		<button onClick={props.onClick} className={buttonClass}>
+		<button className={`${buttonClass} ${props.className}`} type={props.type} onClick={props.onClick} disabled={props.disabled}>
 			{props.children}
 		</button>
 	);

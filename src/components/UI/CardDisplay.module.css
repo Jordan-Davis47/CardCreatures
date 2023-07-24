@@ -1,14 +1,67 @@
 .cardDisplay {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	/* width: 300px;
-	height: 300px;
-	margin: 0 auto;
-	top: 60%;
+	border: 1px solid goldenrod;
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
+	padding: 2%;
+	width: 95vw;
+	height: auto;
+	max-height: 97vh;
+}
+
+.topContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+}
+
+.topContainer p {
 	text-align: center;
-	border: 2px solid white; */
+}
+
+.bottomContainer {
+	padding: 5%;
+}
+
+.cardDisplay h3 {
+	position: relative;
+	bottom: 5px;
+}
+
+.displayedCard {
+	display: flex;
+	flex-direction: column;
+	justify-content: center !important;
+	align-items: center;
+	max-width: 500px !important;
+	max-height: 500px !important;
+	width: 165px !important;
+	height: 255px !important;
+	background-color: rgb(210, 149, 16);
+	border: 3px solid black;
+	cursor: default;
+}
+
+.displayedCard > .stats {
+	font-size: 3rem !important;
+}
+
+.displayedCard p {
+	font-size: 4em;
+}
+
+.buttonContainer {
+	width: 100%;
+	text-align: center;
+	position: relative;
+	top: 20px;
+	display: flex;
+	justify-content: space-around;
 }
 
 .buttonContainer button {
@@ -16,46 +69,57 @@
 	height: 30px;
 }
 
-.atkPositionIcon,
-.defPositionIcon {
-	width: 75px;
-	height: 75px;
-	cursor: pointer;
+.battleContainer {
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
 }
 
-.atkPositionIcon {
-	margin-top: 5px;
-	margin-right: 50px;
+.magicContainer {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto;
+}
+
+.atkPositionIcon,
+.defPositionIcon,
+.spellIcon,
+.trapIcon {
+	width: 3em;
+	height: 3em;
+	cursor: pointer;
+	fill: whitesmoke;
+	margin: 0 auto;
 }
 
 .atkPositionIcon:hover,
 .atkPositionIcon:active,
 .defPositionIcon:hover,
-.defPositionIcon:active {
-	fill: white;
+.defPositionIcon:active,
+.spellIcon:hover,
+.spellIcon:active,
+.trapIcon:hover,
+.trapIcon:active {
+	fill: goldenrod;
 }
 
 .atkPositionIcon + p {
-	position: absolute;
 	left: 3%;
 	color: white;
 }
 
 .defPositionIcon + p {
-	position: absolute;
 	right: 3%;
 	color: white;
 }
 
 .spellIcon {
 	margin: 20px 0 0 5px;
-	width: 75px;
-	height: 75px;
-}
-
-.spellIcon:hover {
-	cursor: pointer;
-	fill: white;
+	width: 4em;
+	height: 4em;
 }
 
 .spellIcon + p {
@@ -64,52 +128,39 @@
 
 .descriptionContainer {
 	margin-top: 50px;
-	width: 100%;
-	height: 30%;
+	width: 90%;
+	/* height: 30%; */
 	color: white;
 	border-top: 2px solid white;
 	padding: 10px;
 	text-align: center;
+	font-size: 1.2rem;
 }
 
-@media (min-width: 350px) {
-	.atkPositionIcon + p {
-		position: absolute;
-		left: 8%;
-		color: white;
+@media (max-width: 470px) {
+	.descriptionContainer {
+		font-size: 1rem;
 	}
-
-	.defPositionIcon + p {
-		position: absolute;
-		right: 8%;
-		color: white;
+	.cardDisplay {
+		bottom: 5vh;
 	}
 }
 
-@media (min-width: 430px) {
-	.atkPositionIcon + p {
-		position: absolute;
-		left: 15%;
-		color: white;
+@media (min-width: 768px) {
+	.displayedCard {
+		display: flex;
+		flex-direction: column;
+		justify-content: center !important;
+		align-items: center;
+		max-width: 500px !important;
+		max-height: 500px !important;
+		width: 225px !important;
+		height: 350px !important;
+		background-color: rgb(210, 149, 16);
+		border: 3px solid black;
 	}
 
-	.defPositionIcon + p {
-		position: absolute;
-		right: 15%;
-		color: white;
-	}
-}
-
-@media (min-width: 460px) {
-	.atkPositionIcon + p {
-		position: absolute;
-		left: 20%;
-		color: white;
-	}
-
-	.defPositionIcon + p {
-		position: absolute;
-		right: 18%;
-		color: white;
+	.displayedCard .stats {
+		font-size: 1.3rem;
 	}
 }

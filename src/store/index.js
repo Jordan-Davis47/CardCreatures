@@ -1,67 +1,75 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
-import { champChooseCard } from "../AiTactics/champ";
 
 //HELPER FUNCTIONS//
 
 const playerInitialState = {
 	//GAME TURNS//
-	turn: 0,
-	//A PLAYER HAS WON//
-	winner: false,
 	//PLAYER TURNS//
-	player1Turn: false,
-	player2Turn: false,
-	//PLAYER LIFE POINTS//
-	player1Life: 2000,
-	player2Life: 2000,
-	//PLAYER HANDS/DECKS/GRAVEYARDS//
-	player1Hand: [],
-	player1Deck: [],
-	player2Hand: [],
-	player2Deck: [],
-	player1Graveyard: [],
-	player2Graveyard: [],
+	player1: {
+		fieldSlots: {
+			fs1: {},
+			fs2: {},
+			fs3: {},
+		},
+		trapSlots: {
+			ts1: {},
+			ts2: {},
+			ts3: {},
+		},
+		fieldSpell: {},
+		hand: [],
+		deck: [],
+		lifePoints: 2000,
+		graveyard: [],
+		hasSummoned: false,
+		isTurn: false,
+		castingSpellCard: {},
+		isCastingSpell: false,
+		stats: {
+			damageDealt: 0,
+			damageHealed: 0,
+			damageTaken: 0,
+			cardsUsed: 0,
+		},
+	},
+	player2: {
+		fieldSlots: {
+			fs1: {},
+			fs2: {},
+			fs3: {},
+		},
+		trapSlots: {
+			ts1: {},
+			ts2: {},
+			ts3: {},
+		},
+		hand: [],
+		deck: [],
+		fieldSpell: {},
+		lifePoints: 2000,
+		graveyard: [],
+		hasSummoned: false,
+		isTurn: false,
+		castingSpellCard: {},
+		isCastingSpell: false,
+		stats: {
+			damageDealt: 0,
+			damageHealed: 0,
+			damageTaken: 0,
+			cardsUsed: 0,
+		},
+	},
+
 	//GAME PHASES//
-	drawPhase: false,
-	summonPhase: false,
-	battlePhase: false,
-	hasSummoned: false,
-	hasAttacked: false,
-	effectPrompt: false,
-	//FIELD CARD SLOTS / PLAY STATE//
-	player1FieldSlot1: [],
-	player1FieldSlot1Playing: false,
-	player1FieldSlot2: [],
-	player1FieldSlot2Playing: false,
-	player1FieldSlot3: [],
-	player1FieldSlot3Playing: false,
-	player2FieldSlot1: [],
-	player2FieldSlot1Playing: false,
-	player2FieldSlot2: [],
-	player2FieldSlot2Playing: false,
-	player2FieldSlot3: [],
-	player2FieldSlot3Playing: false,
-	//SPELL/TRAP CARD SLOTS / PLAY STATE//
-	player1SpellSlot1: [],
-	player1SpellSlot1Playing: false,
-	player1SpellSlot2: [],
-	player1SpellSlot2Playing: false,
-	player1SpellSlot3: [],
-	player1SpellSlot3Playing: false,
-	player2SpellSlot1: [],
-	player2SpellSlot1Playing: false,
-	player2SpellSlot2: [],
-	player2SpellSlot2Playing: false,
-	player2SpellSlot3: [],
-	player2SpellSlot3Playing: false,
-	//FIELD SPELL CARD SLOTS/PLAYING STATES//
-	player1FieldSpell: [],
-	player1FieldSpellPlaying: false,
-	player2FieldSpell: [],
-	player2FieldSpellPlaying: false,
-	//BATTLE SLOTS//
-	attacker: [],
-	defender: [],
+	gamePhases: {
+		turn: 0,
+		drawPhase: false,
+		summonPhase: false,
+		battlePhase: false,
+	},
+
+	attacker: {},
+	defender: {},
 	//TRIBUTING STATES//
 	tributes: [],
 	isTributing: false,
@@ -71,8 +79,9 @@ const playerInitialState = {
 	//SPELL CARD STATES//
 	spellCastCard: [],
 	spellTarget: [],
-	isCastingSpell: false,
-	AiPlaying: true,
+	// isCastingSpell: false,
+	aiPlaying: true,
+	battleLog: [],
 };
 
 const playerSlice = createSlice({
@@ -81,822 +90,493 @@ const playerSlice = createSlice({
 	reducers: {
 		playersDrawHand(state, action) {
 			for (let i = 0; i < 4; i++) {
-				let p1Card = state.player1Deck.shift();
-				state.player1Hand.push(p1Card);
-				let p2Card = state.player2Deck.shift();
-				state.player2Hand.push(p2Card);
+				let p1Card = state.player1.deck.shift();
+				state.player1.hand.push(p1Card);
+				let p2Card = state.player2.deck.shift();
+				state.player2.hand.push(p2Card);
 			}
-			state.turn = state.turn + 1;
+			state.gamePhases.turn = state.gamePhases.turn + 1;
+			state.player1.isTurn = true;
 		},
 
 		setPlayerDeck(state, action) {
 			//shuffle deck//
+			let shuffledDeck = [...action.payload.deck];
+			// console.log("deck:", shuffledDeck);
 			for (let i = 0; i < action.payload.deck.length; i++) {
 				let randomNum = Math.floor(Math.random() * action.payload.deck.length);
-				[action.payload.deck[i], action.payload.deck[randomNum]] = [action.payload.deck[randomNum], action.payload.deck[i]];
+				let card = shuffledDeck[i];
+				shuffledDeck[i] = shuffledDeck[randomNum];
+				shuffledDeck[randomNum] = card;
 			}
 			//set deck based on player//
 			if (action.payload.player === "player1") {
-				state.player1Deck = action.payload.deck;
+				const deck = shuffledDeck.map((card) => (card = { ...card, owner: "p1" }));
+				// console.log("deck with owner:", deck);
+				state.player1.deck = deck;
 			} else if (action.payload.player === "player2") {
-				state.player2Deck = action.payload.deck;
+				const deck = shuffledDeck.map((card) => (card = { ...card, owner: "p2" }));
+				// console.log("deck with owner:", deck);
+				state.player2.deck = deck;
 			}
 		},
-		setPlayerLife() {},
 		//DRAW ONE CARD TO HAND AT START OF TURN//
 		drawCard(state, action) {
-			if (state.player1Turn && state.drawPhase) {
-				if (!state.player1Deck.length) {
-					alert("no more cards");
-					state.summonPhase = true;
-					return;
+			if (action.payload) {
+				console.log("draw", action.payload.drawAmount);
+				// if (state.aiPlaying && action.payload.owner === 'p2') {
+				// 	const deck = state.player2.deck;
+				// 	for (let i = 0; i < action.payload.drawAmount; i++) {
+				// 		const card = deck.shift();
+				// 		state.player2.hand.push(card);
+				// 	}
+				// }
+				if (state.player1.isTurn) {
+					console.log(state.player1.deck);
+					for (let i = 0; i < action.payload.drawAmount; i++) {
+						const card = state.player1.deck.shift();
+						state.player1.hand.push(card);
+					}
+				} else if (state.player2.isTurn || (state.aiPlaying && action.payload.owner === "p2")) {
+					const deck = state.player2.deck;
+					for (let i = 0; i < action.payload.drawAmount; i++) {
+						const card = deck.shift();
+						state.player2.hand.push(card);
+					}
 				}
-				const card = state.player1Deck.shift();
-				state.player1Hand.push(card);
-				state.drawPhase = false;
-				state.summonPhase = true;
+				return;
 			}
-			if (state.player2Turn && state.drawPhase) {
-				if (!state.player2Deck.length) {
-					alert("no more cards");
-					state.summonPhase = true;
+			if (state.player1.isTurn && state.gamePhases.drawPhase) {
+				if (!state.player1.deck.length) {
+					state.gamePhases.drawPhase = false;
+					state.gamePhases.summonPhase = true;
 					return;
 				}
-				const card = state.player2Deck.shift();
-				state.player2Hand.push(card);
-				state.drawPhase = false;
-				state.summonPhase = true;
+				const card = state.player1.deck.shift();
+				state.player1.hand.push(card);
+				state.gamePhases.drawPhase = false;
+				state.gamePhases.summonPhase = true;
+			}
+			if (state.player2.isTurn && state.gamePhases.drawPhase) {
+				console.log("player 2 draw check");
+
+				if (!state.player2.deck.length) {
+					state.gamePhases.drawPhase = false;
+					state.gamePhases.summonPhase = true;
+					return;
+				}
+				// console.log("p2handb4:", state.player2.hand);
+				const card = state.player2.deck.shift();
+				state.player2.hand.push(card);
+				// console.log("p2handafter:", state.player2.hand);
+
+				state.gamePhases.drawPhase = false;
+				state.gamePhases.summonPhase = true;
 			}
 		},
 
-		effectCreator(state, action) {
-			console.log("effect creator triggered");
-			//HEAL LIFE POINTS SPELL HANDLER//
-			if (action.payload.card.effect.type === "Heal") {
-				console.log("firat heal check");
-				if (action.payload.card.owner === "p1") {
-					if (action.payload.card.effect.amount === "atk") {
-						state.player1Life = state.player1Life + state.attacker[0].atk;
-					} else {
-						state.player1Life = state.player1Life + action.payload.card.effect.amount;
-					}
-				} else if (action.payload.card.owner === "p2") {
-					console.log("heal check");
-					if (action.payload.card.effect.amount === "atk") {
-						state.player2Life = state.player2Life + state.attacker[0].atk;
-					} else {
-						state.player2Life = state.player2Life + action.payload.card.effect.amount;
-					}
-				}
-			}
-			//DRAIN LIFE POINTS HANDLER//
-			if (action.payload.card.effect.type === "Drain") {
-				if (action.payload.card.owner === "p1") {
-					state.player2Life = state.player2Life - action.payload.card.effect.amount;
-					state.player1Life = state.player1Life + action.payload.card.effect.amount;
-				} else if (action.payload.card.owner === "p2") {
-					state.player2Life = state.player2Life + action.payload.card.effect.amount;
-					state.player1Life = state.player1Life - action.payload.card.effect.amount;
-				}
-			}
-			//DAMAGE LIFE POINTS SPELL HANDLER//
-			if (action.payload.card.effect.type === "Damage") {
-				if (action.payload.card.owner === "p1") {
-					console.log(action.payload.card);
-					state.player2Life = state.player2Life - action.payload.card.effect.amount;
-				} else if (action.payload.card.owner === "p2") {
-					state.player1Life = state.player1Life - action.payload.card.effect.amount;
-				}
-			}
-			//DESTROY SPELL LOGIC HANDLER //
-			if (action.payload.card.effect.type === "Destroy") {
-				if (action.payload.card.effect.condition) {
-					//SACRIFICE OWN CARDS TO DESTROY LOGIC HANDLER//
-					if (action.payload.card.effect.condition === "Sacrifice") {
-						const p1HandLength = state.player1Hand.length;
-						const p2HandLength = state.player2Hand.length;
-						if (action.payload.card.owner === "p1") {
-							console.log("sacrifce spell card p1 check");
-							if (state.player1Hand.length < action.payload.card.effect.conditionAmount) {
-								alert("Not enough cards in your hand to do that");
-								return;
-							}
-							const randNum = Math.floor(Math.random() * state.player1Hand.length);
-							if (action.payload.card.effect.conditionAmount >= 1) {
-								state.player1Graveyard.push(state.player1Hand[randNum]);
-								const card1 = state.player1Hand[randNum];
-								state.player1Hand = state.player1Hand.filter((c) => c.id !== card1.id);
-							}
-							if (action.payload.card.effect.conditionAmount >= 2) {
-								let card2;
-
-								if (randNum !== 0) {
-									state.player1Graveyard.push(state.player1Hand[randNum - 1]);
-									card2 = state.player1Hand[randNum - 1];
-								} else {
-									state.player1Graveyard.push(state.player1Hand[randNum]);
-									card2 = state.player1Hand[randNum];
-								}
-								state.player1Hand = state.player1Hand.filter((c) => c.id !== card2.id);
-								state.player1Graveyard.push();
-							}
-						} else if (action.payload.card.owner === "p2") {
-							console.log("black hole triggered");
-							if (state.player2Hand.length < action.payload.card.effect.conditionAmount) {
-								alert("Not enough cards in your hand to do that");
-								return;
-							}
-
-							let randNum = Math.floor(Math.random() * state.player2Hand.length);
-							console.log(randNum);
-							if (action.payload.card.effect.conditionAmount >= 1) {
-								state.player2Graveyard.push(state.player2Hand[randNum]);
-								const card1 = state.player2Hand[randNum];
-								state.player2Hand = state.player2Hand.filter((c) => c.id !== card1.id);
-							}
-							if (action.payload.card.effect.conditionAmount >= 2) {
-								randNum = Math.floor(Math.random() * state.player2Hand.length);
-								let card2;
-								if (randNum !== 0) {
-									state.player2Graveyard.push(state.player2Hand[randNum]);
-									card2 = state.player2Hand[randNum - 1];
-								} else {
-									state.player2Graveyard.push(state.player2Hand[randNum]);
-									card2 = state.player2Hand[randNum];
-								}
-								state.player2Hand = state.player2Hand.filter((c) => c.id !== card2.id);
-							}
-						}
-						if (action.payload.card.effect.amount === "all") {
-							if ((state.player1Turn && p1HandLength !== state.player1Hand.length) || (state.player2Turn && p2HandLength !== state.player2Hand.length)) {
-								if (state.player1FieldSlot1Playing) {
-									state.player1Graveyard.push(state.player1FieldSlot1);
-									state.player1FieldSlot1 = [];
-									state.player1FieldSlot1Playing = false;
-								}
-								if (state.player1FieldSlot2Playing) {
-									state.player1Graveyard.push(state.player1FieldSlot2);
-									state.player1FieldSlot2 = [];
-									state.player1FieldSlot2Playing = false;
-								}
-								if (state.player1FieldSlot3Playing) {
-									state.player1Graveyard.push(state.player1FieldSlot3);
-									state.player1FieldSlot3 = [];
-									state.player1FieldSlot3Playing = false;
-								}
-								if (state.player2FieldSlot1Playing) {
-									state.player2Graveyard.push(state.player2FieldSlot1);
-									state.player2FieldSlot1 = [];
-									state.player2FieldSlot1Playing = false;
-								}
-								if (state.player2FieldSlot2Playing) {
-									state.player2Graveyard.push(state.player2FieldSlot2);
-									state.player2FieldSlot2 = [];
-									state.player2FieldSlot2Playing = false;
-								}
-								if (state.player2FieldSlot3Playing) {
-									state.player2Graveyard.push(state.player2FieldSlot3);
-									state.player2FieldSlot3 = [];
-									state.player2FieldSlot3Playing = false;
-								}
-							}
-						}
-					}
-
-					//RANDOM CARD DESTRUCTION SPELL HANDLER//
-					if (action.payload.card.effect.condition === "random") {
-						let multiplier = 0;
-
-						if (action.payload.card.owner === "p1") {
-							if (state.player2FieldSlot1Playing) {
-								multiplier++;
-							}
-							if (state.player2FieldSlot2Playing) {
-								multiplier++;
-							}
-							if (state.player2FieldSlot3Playing) {
-								multiplier++;
-							}
-
-							const randNum = Math.floor(Math.random() * multiplier + 1);
-							console.log("random number:", randNum);
-
-							switch (randNum) {
-								case 1:
-									state.player2Graveyard.push(state.player2FieldSlot1.card);
-									state.player2FieldSlot1 = [];
-									state.player2FieldSlot1Playing = false;
-									break;
-								case 2:
-									state.player2Graveyard.push(state.player2FieldSlot2.card);
-									state.player2FieldSlot2 = [];
-									state.player2FieldSlot2Playing = false;
-									break;
-								case 3:
-									state.player2Graveyard.push(state.player2FieldSlot3.card);
-									state.player2FieldSlot3 = [];
-									state.player2FieldSlot3Playing = false;
-									break;
-								default:
-							}
-						}
-						if (action.payload.card.owner === "p2") {
-							if (state.player1FieldSlot1Playing) {
-								multiplier++;
-							}
-							if (state.player1FieldSlot2Playing) {
-								multiplier++;
-							}
-							if (state.player1FieldSlot3Playing) {
-								multiplier++;
-							}
-							const randNum = Math.floor(Math.random() * multiplier + 1);
-
-							switch (randNum) {
-								case 1:
-									state.player1Graveyard.push(state.player1FieldSlot1.card);
-									state.player1FieldSlot1 = [];
-									state.player1FieldSlot1Playing = false;
-									break;
-								case 2:
-									state.player1Graveyard.push(state.player1FieldSlot2.card);
-									state.player1FieldSlot2 = [];
-									state.player1FieldSlot2Playing = false;
-									break;
-								case 3:
-									state.player1Graveyard.push(state.player1FieldSlot3.card);
-									state.player1FieldSlot3 = [];
-									state.player1FieldSlot3Playing = false;
-									break;
-								default:
-							}
-						}
-					}
-					//STAT IS LESS THAN OR EQUAL DESTROY HANDLER//
-					if (action.payload.card.effect.condition === "less than or equal") {
-						console.log("check1");
-						if (state.attacker[0].atk <= action.payload.card.effect.amount) {
-							console.log("check2");
-							if (action.payload.card.owner === "p1") {
-								state.player2Graveyard.push(state.attacker[0]);
-								console.log("check3");
-								if (state.attacker[1] === "cs4") {
-									state.player2FieldSlot1 = [];
-									state.player2FieldSlot1Playing = false;
-								} else if (state.attacker[1] === "cs5") {
-									state.player2FieldSlot2 = [];
-									state.player2FieldSlot2Playing = false;
-								} else if (state.attacker[1] === "cs6") {
-									state.player2FieldSlot3 = [];
-									state.player2FieldSlot3Playing = false;
-								}
-							}
-							if (action.payload.card.owner === "p2") {
-								state.player1Graveyard.push(state.attacker[0]);
-								console.log("check3");
-								if (state.attacker[1] === "cs1") {
-									state.player1FieldSlot1 = [];
-									state.player1FieldSlot1Playing = false;
-								} else if (state.attacker[1] === "cs2") {
-									state.player1FieldSlot2 = [];
-									state.player1FieldSlot2Playing = false;
-								} else if (state.attacker[1] === "cs3") {
-									state.player1FieldSlot3 = [];
-									state.player1FieldSlot3Playing = false;
-								}
-							}
-							state.attacker = [];
-							state.defender = [];
-						}
-					}
-				}
-			}
-
-			if (action.payload.card.effect.type === "Increase") {
-				// const stat = state.spellCastCard.effect.stat === "atk" ? "atk" : "def";
-				if (state.isCastingSpell) {
-					if (action.payload.slotId === "cs1") {
-						const changedCard = { ...state.player1FieldSlot1, atk: state.player1FieldSlot1.atk + state.spellCastCard.effect.amount };
-						state.player1FieldSlot1 = changedCard;
-						state.isCastingSpell = false;
-					} else if (action.payload.slotId === "cs2") {
-						const changedCard = { ...state.player1FieldSlot2, atk: state.player1FieldSlot2.atk + state.spellCastCard.effect.amount };
-						state.player1FieldSlot2 = changedCard;
-						state.isCastingSpell = false;
-					} else if (action.payload.slotId === "cs3") {
-						const changedCard = { ...state.player1FieldSlot3, atk: state.player1FieldSlot3.atk + state.spellCastCard.effect.amount };
-						state.player1FieldSlot3 = changedCard;
-						state.isCastingSpell = false;
-					} else if (action.payload.slotId === "cs4") {
-						const changedCard = { ...state.player2FieldSlot1, atk: state.player2FieldSlot1.atk + state.spellCastCard.effect.amount };
-						state.player2FieldSlot1 = changedCard;
-						state.isCastingSpell = false;
-					} else if (action.payload.slotId === "cs5") {
-						const changedCard = { ...state.player2FieldSlot2, atk: state.player2FieldSlot2.atk + state.spellCastCard.effect.amount };
-						state.player2FieldSlot2 = changedCard;
-						state.isCastingSpell = false;
-					} else if (action.payload.slotId === "cs6") {
-						const changedCard = { ...state.player2FieldSlot3, atk: state.player2FieldSlot3.atk + state.spellCastCard.effect.amount };
-						state.player2FieldSlot3 = changedCard;
-						state.isCastingSpell = false;
-					}
-					if (action.payload.slotId === ("cs1" || "cs2" || "cs3")) {
-						const usedCard = state.player1Hand.find((card) => card.id === action.payload.card.id);
-						state.player1Graveyard.push(usedCard);
-						state.player1Hand = state.player1Hand.filter((card) => card.id !== action.payload.card.id);
-						return;
-					} else if (action.payload.slotId === ("cs4" || "cs5" || "cs6")) {
-						const usedCard = state.player1Hand.find((card) => card.id === action.payload.card.id);
-						state.player1Graveyard.push(usedCard);
-						state.player1Hand = state.player1Hand.filter((card) => card.id !== action.payload.card.id);
-						return;
-					}
-				}
-				state.isCastingSpell = true;
-			}
-			if (action.payload.card.effect.type === "Draw") {
-				if (action.payload.card.owner === "p1") {
-					for (let i = 0; i < action.payload.card.effect.amount; i++) {
-						state.player1Hand.push(state.player1Deck[i]);
-						state.player1Deck.shift();
-					}
-				} else if (action.payload.card.owner === "p2") {
-					for (let i = 0; i < action.payload.card.effect.amount; i++) {
-						state.player2Hand.push(state.player2Deck[i]);
-						state.player2Deck.shift();
-					}
-				}
-			}
-			if (action.payload.card.effect.type === "Summon") {
-				if (action.payload.card.effect.condition === "Deck to hand") {
-					const possibleCards = [];
-					if (action.payload.card.owner === "p1") {
-						state.player1Deck.forEach((card) => {
-							if (card.type === "monster") {
-								possibleCards.push(card);
-							}
-						});
-						const randNum = Math.floor(Math.random() * possibleCards.length);
-						state.player1Hand.push(possibleCards[randNum]);
-					} else if (action.payload.card.owner === "p2") {
-						state.player2Deck.forEach((card) => {
-							if (card.type === "monster") {
-								possibleCards.push(card);
-							}
-						});
-						const randNum = Math.floor(Math.random() * possibleCards.length);
-						state.player2Hand.push(possibleCards[randNum]);
-					}
-				}
-			}
-			//****FIELD SPELL STAT BUFF LOGIC - BUFF EVERY CARD ON PLAYER FIELD ONCE EACH TIME A NEW CARD IS SUMMONED ONTO FIELD****/
-			if (action.payload.card.effect.type === "Field Spell") {
-				if (action.payload.card.owner === "p1") {
-					if (!state.player1FieldSpell.length) {
-						state.player1FieldSpell = action.payload.card;
-						state.player1FieldSpellPlaying = true;
-					}
-					if (!state.player1FieldSlot1.fieldSpellBuffed && state.player1FieldSlot1Playing) {
-						console.log("field spell activated!!");
-						if (action.payload.card.effect.stat === "def") {
-							const changedCard = { ...state.player1FieldSlot1, def: state.player1FieldSlot1.def + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player1FieldSlot1 = changedCard;
-						}
-						if (action.payload.card.effect.stat === "atk") {
-							const changedCard = { ...state.player1FieldSlot1, atk: state.player1FieldSlot1.atk + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player1FieldSlot1 = changedCard;
-						}
-					}
-					if (!state.player1FieldSlot2.fieldSpellBuffed && state.player1FieldSlot2Playing) {
-						if (action.payload.card.effect.stat === "def") {
-							console.log("field spell activated!!");
-							const changedCard = { ...state.player1FieldSlot2, def: state.player1FieldSlot2.def + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player1FieldSlot2 = changedCard;
-						}
-						if (action.payload.card.effect.stat === "atk") {
-							const changedCard = { ...state.player1FieldSlot2, atk: state.player1FieldSlot2.atk + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player1FieldSlot2 = changedCard;
-						}
-					}
-					if (!state.player1FieldSlot3.fieldSpellBuffed && state.player1FieldSlot3Playing) {
-						console.log("field spell activated!!");
-						if (action.payload.card.effect.stat === "def") {
-							const changedCard = { ...state.player1FieldSlot3, def: state.player1FieldSlot3.def + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player1FieldSlot3 = changedCard;
-						}
-						if (action.payload.card.effect.stat === "atk") {
-							const changedCard = { ...state.player1FieldSlot3, atk: state.player1FieldSlot3.atk + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player1FieldSlot3 = changedCard;
-						}
-					}
-				}
-				if (action.payload.card.owner === "p2") {
-					if (!state.player2FieldSpell.length) {
-						state.player2FieldSpell = action.payload.card;
-						state.player2FieldSpellPlaying = true;
-					}
-					if (!state.player2FieldSlot1.fieldSpellBuffed && state.player2FieldSlot1Playing) {
-						console.log("field spell activated!!");
-						if (action.payload.card.effect.stat === "def") {
-							const changedCard = { ...state.player2FieldSlot1, def: state.player2FieldSlot1.def + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player2FieldSlot1 = changedCard;
-						}
-						if (action.payload.card.effect.stat === "atk") {
-							const changedCard = { ...state.player2FieldSlot1, atk: state.player2FieldSlot1.atk + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player2FieldSlot1 = changedCard;
-						}
-					}
-					if (!state.player2FieldSlot2.fieldSpellBuffed && state.player2FieldSlot2Playing) {
-						if (action.payload.card.effect.stat === "def") {
-							const changedCard = { ...state.player2FieldSlot2, def: state.player2FieldSlot2.def + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player2FieldSlot2 = changedCard;
-						}
-						if (action.payload.card.effect.stat === "atk") {
-							const changedCard = { ...state.player2FieldSlot2, atk: state.player2FieldSlot2.atk + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player2FieldSlot2 = changedCard;
-						}
-					}
-					if (!state.player2FieldSlot3.fieldSpellBuffed && state.player2FieldSlot3Playing) {
-						if (action.payload.card.effect.stat === "def") {
-							const changedCard = { ...state.player2FieldSlot3, def: state.player2FieldSlot3.def + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player2FieldSlot3 = changedCard;
-						}
-						if (action.payload.card.effect.stat === "atk") {
-							const changedCard = { ...state.player2FieldSlot3, atk: state.player2FieldSlot3.atk + action.payload.card.effect.amount, fieldSpellBuffed: true };
-							state.player2FieldSlot3 = changedCard;
-						}
-					}
-				}
-			}
-			//****FIND USED SPELL/TRAP CARD AND REMOVE FROM HAND AND INTO GRAVEYARD****//
-			if (action.payload.card.owner === "p1" && action.payload.card.type !== "trap") {
-				const usedCard = state.player1Hand.find((card) => card.id === action.payload.card.id);
-				state.player1Graveyard.push(usedCard);
-				state.player1Hand = state.player1Hand.filter((card) => card.id !== action.payload.card.id);
-			} else if (action.payload.card.owner === "p2" && action.payload.card.type !== "trap") {
-				const usedCard = state.player2Hand.find((card) => card.id === action.payload.card.id);
-				state.player2Graveyard.push(usedCard);
-				state.player2Hand = state.player2Hand.filter((card) => card.id !== action.payload.card.id);
-			} else if (action.payload.card.owner === "p1" && action.payload.card.type === "trap") {
-				console.log("last trap check");
-				let traps = [state.player1SpellSlot1, state.player1SpellSlot2, state.player1SpellSlot3];
-				const usedCard = traps.find((card) => card.id === action.payload.card.id);
-				state.player1Graveyard.push(usedCard);
-				const cardIndex = traps.findIndex((card) => card.id === usedCard.id);
-				if (cardIndex === 0) {
-					state.player1SpellSlot1 = [];
-					state.player1SpellSlot1Playing = false;
-				} else if (cardIndex === 1) {
-					state.player1SpellSlot2 = [];
-					state.player1SpellSlot2Playing = false;
-				} else if (cardIndex === 2) {
-					state.player1SpellSlot3 = [];
-					state.player1SpellSlot3Playing = false;
-				}
-			} else if (action.payload.card.owner === "p2" && action.payload.card.type === "trap") {
-				console.log("last trap check p2");
-				let traps = [state.player2SpellSlot1, state.player2SpellSlot2, state.player2SpellSlot3];
-				const usedCard = traps.find((card) => card.id === action.payload.card.id);
-				state.player2Graveyard.push(usedCard);
-				const cardIndex = traps.findIndex((card) => card.id === usedCard.id);
-				if (cardIndex === 0) {
-					state.player2SpellSlot1 = [];
-					state.player2SpellSlot1Playing = false;
-				} else if (cardIndex === 1) {
-					state.player2SpellSlot2 = [];
-					state.player2SpellSlot2Playing = false;
-				} else if (cardIndex === 2) {
-					state.player2SpellSlot3 = [];
-					state.player2SpellSlot3Playing = false;
-				}
-			}
-		},
 		//SETS CURRENTLY USED SPELL CARD FOR REFERENCE//
 		setSpellCastCard(state, action) {
 			state.spellCastCard = action.payload.card;
 		},
-
 		//LOGIC FOR SUMMONING CARD ONTO FIELD///
 		placeCard(state, action) {
 			if (!action.payload.card) {
 				return;
 			}
-			console.log("placeCardCheck!", action.payload.card);
-			if (action.payload.player === "player1") {
+			console.log("placeCardCheck!", action.payload);
+			if (action.payload.player === "p1") {
 				if (action.payload.card.type === "trap") {
 					console.log("trap card check!!");
-					if (!state.player1SpellSlot1Playing) {
-						state.player1SpellSlot1 = action.payload.card;
-						state.player1SpellSlot1Playing = true;
-					} else if (!state.player1SpellSlot2Playing) {
-						state.player1SpellSlot2 = action.payload.card;
-						state.player1SpellSlot2Playing = true;
-					} else if (!state.player1SpellSlot3Playing) {
-						state.player1SpellSlot3 = action.payload.card;
-						state.player1SpellSlot3Playing = true;
+					if (!state.player1.trapSlots.ts1.owner) {
+						const card = { ...action.payload.card, slot: "p1t1", isPlaying: true, setTrap: true };
+						state.player1.trapSlots.ts1 = card;
+						state.player1.stats.cardsUsed++;
+					} else if (!state.player1.trapSlots.ts2.owner) {
+						const card = { ...action.payload.card, slot: "p1t2", isPlaying: true, setTrap: true };
+						state.player1.trapSlots.ts2 = card;
+						state.player1.stats.cardsUsed++;
+					} else if (!state.player1.trapSlots.ts3.owner) {
+						const card = { ...action.payload.card, slot: "p1t3", isPlaying: true, setTrap: true };
+						state.player1.trapSlots.ts3 = card;
+						state.player1.stats.cardsUsed++;
+					} else {
+						console.log("CANNOT PLACE ANY MORE TRAP CARDS");
+						return;
 					}
-					state.player1Hand = state.player1Hand.filter((card) => card.id !== action.payload.card.id);
+					state.player1.hand = state.player1.hand.filter((card) => card.id !== action.payload.card.id);
 					return;
 				}
 
-				if (!state.player1FieldSlot1Playing && !state.hasSummoned && state.summonPhase) {
-					state.player1FieldSlot1 = action.payload.card;
-					state.player1FieldSlot1Playing = true;
-					state.hasSummoned = true;
-					// if (state.player1FieldSlot1.effect) {
-					// 	console.log(state.player1FieldSlot1.effect.name, state.player1FieldSlot1.effect.type, state.player1FieldSlot1.effect.amount);
-					// 	state.effectPrompt = true;
-					// }
-				} else if (!state.player1FieldSlot2Playing && !state.hasSummoned && state.summonPhase) {
-					state.player1FieldSlot2 = action.payload.card;
-					state.player1FieldSlot2Playing = true;
-					state.hasSummoned = true;
-				} else if (!state.player1FieldSlot3Playing && !state.hasSummoned && state.summonPhase) {
-					state.player1FieldSlot3 = action.payload.card;
-					state.player1FieldSlot3Playing = true;
-					state.hasSummoned = true;
-				} else {
-					alert("cant place more cards");
+				if (action.payload.card.type === "spell") {
+					const card = { ...action.payload.card, slot: "p1fs1", isPlaying: true };
+					console.log(card);
+					state.player1.fieldSpell = card;
+					state.player1.stats.cardsUsed++;
+					state.player1.hand = state.player1.hand.filter((card) => card.id !== action.payload.card.id);
+					return;
 				}
-				state.player1Hand = state.player1Hand.filter((card) => card.id !== action.payload.card.id);
-			} else if (action.payload.player === "player2") {
+				console.log(state.player1.fieldSlots.fs1.owner, state.player1.hasSummoned, state.gamePhases.summonPhase);
+				if (!state.player1.fieldSlots.fs1.owner && !state.player1.hasSummoned && state.gamePhases.summonPhase) {
+					console.log("p1s1 trib check");
+					const card = { ...action.payload.card, slot: "p1s1", isPlaying: true };
+					state.player1.fieldSlots.fs1 = card;
+					state.player1.stats.cardsUsed++;
+					if (card.position === "def") {
+						state.battleLog.push(`Player 1 summoned a monster in defence position`);
+					} else {
+						state.battleLog.push(`Player 1 summoned ${card.name} to the field`);
+					} // state.player1.hasSummoned = true;
+					// state.hasSummoned = true;
+				} else if (!state.player1.fieldSlots.fs2.owner && !state.player1.hasSummoned && state.gamePhases.summonPhase) {
+					const card = { ...action.payload.card, slot: "p1s2", isPlaying: true };
+					state.player1.fieldSlots.fs2 = card;
+					state.player1.stats.cardsUsed++;
+					if (card.position === "def") {
+						state.battleLog.push(`Player 1 summoned a monster in defence position`);
+					} else {
+						state.battleLog.push(`Player 1 summoned ${card.name} to the field`);
+					}
+					// state.player1.hasSummoned = true;
+				} else if (!state.player1.fieldSlots.fs3.owner && !state.player1.hasSummoned && state.gamePhases.summonPhase) {
+					const card = { ...action.payload.card, slot: "p1s3", isPlaying: true };
+					state.player1.fieldSlots.fs3 = card;
+					state.player1.stats.cardsUsed++;
+					if (card.position === "def") {
+						state.battleLog.push(`Player 1 summoned a monster in defence position`);
+					} else {
+						state.battleLog.push(`Player 1 summoned ${card.name} to the field`);
+					}
+					// state.player1.hasSummoned = true;
+				} else {
+					console.log("cant place anymore cards this turn");
+					return;
+				}
+				state.player1.hand = state.player1.hand.filter((card) => card.id !== action.payload.card.id);
+				state.selectedCard = {};
+			} else if (action.payload.player === "p2") {
 				if (action.payload.card.type === "trap") {
-					console.log("p2 trap check ");
-					if (!state.player2SpellSlot1Playing) {
-						console.log("yet anotnher trap check");
-						state.player2SpellSlot1 = action.payload.card;
-						state.player2SpellSlot1Playing = true;
-					} else if (!state.player2SpellSlot2Playing) {
-						state.player2SpellSlot2 = action.payload.card;
-						state.player2SpellSlot2Playing = true;
-					} else if (!state.player2SpellSlot3Playing) {
-						state.player2SpellSlot3 = action.payload.card;
-						state.player2SpellSlot3Playing = true;
+					console.log("trap card check!!");
+					if (!state.player2.trapSlots.ts1.owner) {
+						const card = { ...action.payload.card, slot: "p2t1", isPlaying: true, setTrap: true };
+						state.player2.trapSlots.ts1 = card;
+						state.player2.stats.cardsUsed++;
+					} else if (!state.player2.trapSlots.ts2.owner) {
+						const card = { ...action.payload.card, slot: "p2t2", isPlaying: true, setTrap: true };
+						state.player2.trapSlots.ts2 = card;
+						state.player2.stats.cardsUsed++;
+					} else if (!state.player2.trapSlots.ts3.owner) {
+						const card = { ...action.payload.card, slot: "p2t3", isPlaying: true, setTrap: true };
+						state.player2.trapSlots.ts3 = card;
+						state.player2.stats.cardsUsed++;
+					} else {
+						console.log("CANNOT PLACE ANY MORE TRAP CARDS");
+						return;
 					}
-					state.player2Hand = state.player2Hand.filter((card) => card.id !== action.payload.card.id);
+					state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.card.id);
 					return;
 				}
 
-				if (!state.player2FieldSlot1Playing && !state.hasSummoned && state.summonPhase) {
-					state.player2FieldSlot1 = action.payload.card;
-					state.player2FieldSlot1Playing = true;
-					state.hasSummoned = true;
-					state.player2Hand = state.player2Hand.filter((card) => card.id !== action.payload.card.id);
-				} else if (!state.player2FieldSlot2Playing && !state.hasSummoned && state.summonPhase) {
-					state.player2FieldSlot2 = action.payload.card;
-					state.player2FieldSlot2Playing = true;
-					state.hasSummoned = true;
-					state.player2Hand = state.player2Hand.filter((card) => card.id !== action.payload.card.id);
-				} else if (!state.player2FieldSlot3Playing && !state.hasSummoned && state.summonPhase) {
-					state.player2FieldSlot3 = action.payload.card;
-					state.player2FieldSlot3Playing = true;
-					state.hasSummoned = true;
-					state.player2Hand = state.player2Hand.filter((card) => card.id !== action.payload.card.id);
-				} else {
-					// alert("cant place more cards");
+				if (action.payload.card.type === "spell") {
+					const card = { ...action.payload.card, slot: "p2fs1", isPlaying: true };
+					state.player2.fieldSpell = card;
+					state.player2.stats.cardsUsed++;
+					state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.card.id);
+					return;
 				}
+
+				console.log(state.player2.fieldSlots.fs1.owner, state.player2.hasSummoned, state.gamePhases.summonPhase);
+
+				if (!state.player2.fieldSlots.fs1.owner && !state.player2.hasSummoned && (state.gamePhases.summonPhase || state.aiPlaying)) {
+					const card = { ...action.payload.card, slot: "p2s1", isPlaying: true };
+					state.player2.fieldSlots.fs1 = card;
+					state.player2.hasSummoned = true;
+					state.player2.stats.cardsUsed++;
+					if (card.position === "def") {
+						state.battleLog.push(`Player 2 summoned a monster in defence position`);
+					} else {
+						state.battleLog.push(`Player 2 summoned ${card.name} to the field`);
+					}
+
+					state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.card.id);
+				} else if (!state.player2.fieldSlots.fs2.owner && !state.player2.hasSummoned && (state.gamePhases.summonPhase || state.aiPlaying)) {
+					const card = { ...action.payload.card, slot: "p2s2", isPlaying: true };
+					state.player2.fieldSlots.fs2 = card;
+					state.player2.hasSummoned = true;
+					state.player2.stats.cardsUsed++;
+					if (card.position === "def") {
+						state.battleLog.push(`Player 2 summoned a monster in defence position`);
+					} else {
+						state.battleLog.push(`Player 2 summoned ${card.name} to the field`);
+					}
+					state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.card.id);
+				} else if (!state.player2.fieldSlots.fs3.owner && !state.player2.hasSummoned && (state.gamePhases.summonPhase || state.aiPlaying)) {
+					const card = { ...action.payload.card, slot: "p2s3", isPlaying: true };
+					state.player2.fieldSlots.fs3 = card;
+					state.player2.hasSummoned = true;
+					state.player2.stats.cardsUsed++;
+					if (card.position === "def") {
+						state.battleLog.push(`Player 2 summoned a monster in defence position`);
+					} else {
+						state.battleLog.push(`Player 2 summoned ${card.name} to the field`);
+					}
+					state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.card.id);
+				} else {
+					console.log("CANNOT PLACE ANYMORE CARDS THIS TURN...");
+					return;
+				}
+				state.selectedCard = {};
 			}
-			console.log(state.hasSummoned);
 		},
 		//SETS ATTACKING AND DEFENDING CARDS WHEN CHOSEN ON BOARD//
 		battleSelect(state, action) {
-			if (state.attacker.length && !state.defender.length) {
-				//DIRECT ATTACK SETTER LOGIC - SETS DEFENDER SO LIFE POINTS CAN BE DIRECTLY ATTACKED//
-				if (action.payload.slotId === "Direct Attack") {
-					state.defender = ["Direct Attack"];
+			const payload = action.payload;
+
+			if (state.attacker.owner && !state.defender.owner) {
+				// ATTACK SETTER LOGIC - SETS DEFENDER SO LIFE POINTS CAN BE DIRECTLY ATTACKED//
+				if (payload.card.owner === "lifePoints") {
+					state.defender = { ...payload.card };
 					console.log("direct attck selcted!");
 				}
 				//NON DIRECT ATTACK DEFENDER SELECTOR LOGIC//
 				console.log("set defender check");
-
-				if (action.payload.slotId === "cs1") {
-					state.defender = [state.player1FieldSlot1, action.payload.slotId];
-				} else if (action.payload.slotId === "cs2") {
-					state.defender = [state.player1FieldSlot2, action.payload.slotId];
-				} else if (action.payload.slotId === "cs3") {
-					state.defender = [state.player1FieldSlot3, action.payload.slotId];
-				} else if (action.payload.slotId === "cs4") {
-					state.defender = [state.player2FieldSlot1, action.payload.slotId];
-				} else if (action.payload.slotId === "cs5") {
-					state.defender = [state.player2FieldSlot2, action.payload.slotId];
-				} else if (action.payload.slotId === "cs6") {
-					state.defender = [state.player2FieldSlot3, action.payload.slotId];
+				if (payload.card.owner === "p1" && !state.player1.isTurn) {
+					state.defender = { ...payload.card };
+				} else if (payload.card.owner === "p2" && !state.player2.isTurn) {
+					state.defender = { ...payload.card };
 				}
 			}
-			if (!state.attacker.length) console.log("set Attacker check");
-			if (action.payload.slotId === "cs1" && !state.player1FieldSlot1.hasAttacked && state.player1Turn && state.player1FieldSlot1.position !== "def") {
-				state.attacker = [{ ...state.player1FieldSlot1, owner: "p1" }, action.payload.slotId];
-			} else if (action.payload.slotId === "cs2" && !state.player1FieldSlot2.hasAttacked && state.player1Turn && state.player1FieldSlot2.position !== "def") {
-				state.attacker = [{ ...state.player1FieldSlot2, owner: "p1" }, action.payload.slotId];
-			} else if (action.payload.slotId === "cs3" && !state.player1FieldSlot3.hasAttacked && state.player1Turn && state.player1FieldSlot3.position !== "def") {
-				state.attacker = [{ ...state.player1FieldSlot3, owner: "p1" }, action.payload.slotId];
-			} else if (action.payload.slotId === "cs4" && !state.player2FieldSlot1.hasAttacked && state.player2Turn && state.player2FieldSlot1.position !== "def") {
-				state.attacker = [{ ...state.player2FieldSlot1, owner: "p2" }, action.payload.slotId];
-			} else if (action.payload.slotId === "cs5" && !state.player2FieldSlot2.hasAttacked && state.player2Turn && state.player2FieldSlot2.position !== "def") {
-				state.attacker = [{ ...state.player2FieldSlot2, owner: "p2" }, action.payload.slotId];
-			} else if (action.payload.slotId === "cs6" && !state.player2FieldSlot3.hasAttacked && state.player2Turn && state.player2FieldSlot3.position !== "def") {
-				state.attacker = [{ ...state.player2FieldSlot3, owner: "p2" }, action.payload.slotId];
+
+			if (!payload.card.hasAttacked && payload.card.position !== "def") {
+				console.log("FIRST BATTLE SELECT CHECK PASSED");
+				if ((payload.card.slot === "p1s1" || payload.card.slot === "p1s2" || payload.card.slot === "p1s3") && state.player1.isTurn) {
+					console.log("attacker set");
+					state.attacker = { ...payload.card };
+				}
+				if ((payload.card.slot === "p2s1" || payload.card.slot === "p2s2" || payload.card.slot === "p2s3") && state.player2.isTurn) {
+					console.log("p2 attacker set check");
+					state.attacker = { ...payload.card };
+				}
+			}
+		},
+
+		setAiAttackerDefender(state, action) {
+			console.log("setA&D:", action.payload);
+			state.attacker = action.payload.attacker;
+			state.defender = action.payload.defender;
+			state.battleLog.push(`${state.attacker.name} attacked ${state.defender.name}`);
+		},
+
+		setPlayerSpellCard(state, action) {
+			if (action.payload.player === "p1") {
+				state.player1.castingSpellCard = action.payload.card;
+				state.player1.isCastingSpell = true;
+			} else if (action.payload.player === "p2") {
+				state.player2.castingSpellCard = action.payload.card;
+				state.player2.isCastingSpell = true;
+			}
+		},
+
+		clearPlayerSpellCard(state, action) {
+			if (action.payload.player === "p1") {
+				state.player1.castingSpellCard = {};
+				state.player2.stats.cardsUsed++;
+				state.player1.isCastingSpell = false;
+			} else if (action.payload.player === "p2") {
+				state.player2.castingSpellCard = {};
+				state.player2.stats.cardsUsed++;
+				state.player2.isCastingSpell = false;
+			}
+		},
+
+		setHasAttacked(state, action) {
+			if (action.payload.slotId === "p1s1") {
+				state.player1.fieldSlots.fs1 = { ...state.player1.fieldSlots.fs1, hasAttacked: true };
+			} else if (action.payload.slotId === "p1s2") {
+				state.player1.fieldSlots.fs2 = { ...state.player1.fieldSlots.fs2, hasAttacked: true };
+			} else if (action.payload.slotId === "p1s3") {
+				state.player1.fieldSlots.fs3 = { ...state.player1.fieldSlots.fs3, hasAttacked: true };
+			} else if (action.payload.slotId === "p2s1") {
+				state.player2.fieldSlots.fs1 = { ...state.player2.fieldSlots.fs1, hasAttacked: true };
+			} else if (action.payload.slotId === "p2s2") {
+				state.player2.fieldSlots.fs2 = { ...state.player2.fieldSlots.fs2, hasAttacked: true };
+			} else if (action.payload.slotId === "p2s3") {
+				state.player2.fieldSlots.fs3 = { ...state.player2.fieldSlots.fs3, hasAttacked: true };
+			}
+			// state.attacker = { ...state.attacker, hasAttacked: true };
+		},
+
+		updatePlayerLife(state, action) {
+			console.log("update player life reached");
+			console.log(action.payload);
+
+			const calculateLpDiff = (lp, player) => {
+				const playerCurrentLp = player === "p1" ? state.player1.lifePoints : state.player2.lifePoints;
+				console.log(playerCurrentLp, lp);
+				if (lp < playerCurrentLp) {
+					const dmg = playerCurrentLp - lp;
+					console.log(dmg);
+					player === "p1" ? (state.player1.stats.damageTaken = state.player1.stats.damageTaken + dmg) : (state.player2.stats.damageTaken = state.player2.stats.damageTaken + dmg);
+					player === "p1" ? (state.player2.stats.damageDealt = state.player2.stats.damageDealt + dmg) : (state.player1.stats.damageDealt = state.player1.stats.damageDealt + dmg);
+				} else if (lp > playerCurrentLp) {
+					const heal = lp - playerCurrentLp;
+					player === "p1" ? (state.player1.stats.damageHealed = state.player1.stats.damageHealed + heal) : (state.player2.stats.damageHealed = state.player2.stats.damageHealed + heal);
+				}
+			};
+
+			if (action.payload.player === "both") {
+				calculateLpDiff(action.payload.newLifePoints.p1, "p1");
+				state.player1.lifePoints = action.payload.newLifePoints.p1;
+				calculateLpDiff(action.payload.newLifePoints.p2, "p2");
+				state.player2.lifePoints = action.payload.newLifePoints.p2;
+			} else if (action.payload.player === "p1") {
+				calculateLpDiff(action.payload.newLifePoints, "p1");
+				state.player1.lifePoints = action.payload.newLifePoints;
+			} else if (action.payload.player === "p2") {
+				calculateLpDiff(action.payload.newLifePoints, "p2");
+				state.player2.lifePoints = action.payload.newLifePoints;
+			}
+		},
+
+		updateCard(state, action) {
+			const slot = action.payload.updatedCard.slot;
+			if (slot === "p1s1") {
+				state.player1.fieldSlots.fs1 = { ...action.payload.updatedCard };
+			} else if (slot === "p1s2") {
+				state.player1.fieldSlots.fs2 = { ...action.payload.updatedCard };
+			} else if (slot === "p1s3") {
+				state.player1.fieldSlots.fs3 = { ...action.payload.updatedCard };
+			} else if (slot === "p2s1") {
+				state.player2.fieldSlots.fs1 = { ...action.payload.updatedCard };
+			} else if (slot === "p2s2") {
+				state.player2.fieldSlots.fs2 = { ...action.payload.updatedCard };
+			} else if (slot === "p2s3") {
+				state.player2.fieldSlots.fs3 = { ...action.payload.updatedCard };
+			}
+			state.player1.isCastingSpell = false;
+			state.player1.spellCastCard = {};
+			state.player2.isCastingSpell = false;
+			state.player2.spellCastCard = {};
+		},
+
+		updatePlayerHand(state, action) {
+			if (action.payload.player === "p1") {
+				state.player1.hand = action.payload.hand;
+			} else if (action.payload.player === "p2") {
+				state.player2.hand = action.payload.hand;
+			}
+		},
+
+		removeUsedSpellCard(state, action) {
+			console.log("remove spell:", action.payload);
+			if (action.payload.owner === "p1") {
+				const card = state.player1.hand.find((card) => card.id === action.payload.id);
+				console.log(card);
+				state.player1.graveyard.push(card);
+				state.player1.hand = state.player1.hand.filter((card) => card.id !== action.payload.id);
+				state.player1.stats.cardsUsed++;
+			} else {
+				const card = state.player2.hand.find((card) => card.id === action.payload.id);
+				console.log(card);
+				state.player2.graveyard.push(card);
+				state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.id);
+				state.player2.stats.cardsUsed++;
+			}
+		},
+
+		clearFieldSlot(state, action) {
+			console.log(action.payload);
+			if (action.payload.sacrificeLocation === "hand") {
+				if (action.payload.player === "p1") {
+					for (let i = 0; i < action.payload.slotIds.length; i++) {
+						const card = state.player1.hand.find((card) => card.id === action.payload.slotIds[i]);
+						console.log(card);
+						state.player1.graveyard.push(card);
+						state.player1.hand = state.player1.hand.filter((card) => card.id !== action.payload.slotIds[i]);
+						state.battleLog.push(`Player 1 sent ${card.name} to the graveyard`);
+					}
+				} else if (action.payload.player === "p2") {
+					for (let i = 0; i < action.payload.slotIds.length; i++) {
+						const card = state.player2.hand.find((card) => card.id === action.payload.slotIds[i]);
+						console.log(card);
+						state.player2.graveyard.push(card);
+						state.player2.hand = state.player2.hand.filter((card) => card.id !== action.payload.slotIds[i]);
+						state.battleLog.push(`Player 2 sent ${card.name} to the graveyard`);
+					}
+				}
+			}
+
+			if (action.payload.slotIds[0] === "all") {
+				state.player1.fieldSlots = {
+					fs1: {},
+					fs2: {},
+					fs3: {},
+				};
+				state.player2.fieldSlots = {
+					fs1: {},
+					fs2: {},
+					fs3: {},
+				};
+			} else {
+				for (let i = 0; i < action.payload.slotIds.length; i++) {
+					console.log(action.payload);
+					console.log(action.payload.slotIds[0]);
+					if (typeof action.payload.slotIds === "string") {
+						console.log("STRING CHECK");
+						action.payload.slotIds = [action.payload.slotIds];
+					}
+					console.log(action.payload.slotIds, action.payload.slotIds[0]);
+
+					if (action.payload.slotIds[i] === "p1s1") {
+						console.log("p1s1 clear reached");
+						state.player1.graveyard = [...state.player1.graveyard, state.player1.fieldSlots.fs1];
+						state.battleLog.push(`${state.player1.fieldSlots.fs1.name} was sent to the graveyard 1`);
+						state.player1.fieldSlots.fs1 = {};
+					} else if (action.payload.slotIds[i] === "p1s2") {
+						state.player1.graveyard = [...state.player1.graveyard, state.player1.fieldSlots.fs2];
+						state.battleLog.push(`${state.player1.fieldSlots.fs2.name} was sent to the graveyard`);
+						state.player1.fieldSlots.fs2 = {};
+					} else if (action.payload.slotIds[i] === "p1s3") {
+						state.player1.graveyard = [...state.player1.graveyard, state.player1.fieldSlots.fs3];
+						state.battleLog.push(`${state.player1.fieldSlots.fs3.name} was sent to the graveyard`);
+						state.player1.fieldSlots.fs3 = {};
+					} else if (action.payload.slotIds[i] === "p2s1") {
+						state.player2.graveyard = [...state.player2.graveyard, state.player2.fieldSlots.fs1];
+						state.battleLog.push(`${state.player2.fieldSlots.fs1.name} was sent to the graveyard`);
+						state.player2.fieldSlots.fs1 = {};
+					} else if (action.payload.slotIds[i] === "p2s2") {
+						state.player2.graveyard = [...state.player2.graveyard, state.player2.fieldSlots.fs2];
+						state.battleLog.push(`${state.player2.fieldSlots.fs2.name} was sent to the graveyard`);
+						state.player2.fieldSlots.fs2 = {};
+					} else if (action.payload.slotIds[i] === "p2s3") {
+						state.player2.graveyard = [...state.player2.graveyard, state.player2.fieldSlots.fs3];
+						state.battleLog.push(`${state.player2.fieldSlots.fs3.name} was sent to the graveyard`);
+						state.player2.fieldSlots.fs3 = {};
+					} else if (action.payload.slotIds[i] === "p1t1") {
+						state.player1.graveyard = [...state.player1.graveyard, state.player1.trapSlots.ts1];
+						state.player1.trapSlots.ts1 = {};
+					} else if (action.payload.slotIds[i] === "p1t2") {
+						state.player1.graveyard = [...state.player1.graveyard, state.player1.trapSlots.ts2];
+						state.player1.trapSlots.ts2 = {};
+					} else if (action.payload.slotIds[i] === "p1t3") {
+						state.player1.graveyard = [...state.player1.graveyard, state.player1.trapSlots.ts3];
+						state.player1.trapSlots.ts3 = {};
+					} else if (action.payload.slotIds[i] === "p2t1") {
+						state.player2.graveyard = [...state.player2.graveyard, state.player2.trapSlots.ts1];
+						state.player2.trapSlots.ts1 = {};
+					} else if (action.payload.slotIds[i] === "p2t2") {
+						state.player2.graveyard = [...state.player2.graveyard, state.player2.trapSlots.ts2];
+						state.player2.trapSlots.ts2 = {};
+					} else if (action.payload.slotIds[i] === "p2t3") {
+						state.player2.graveyard = [...state.player2.graveyard, state.player2.trapSlots.ts3];
+						state.player2.trapSlots.ts3 = {};
+					}
+				}
 			}
 		},
 
 		//CALCULATES DAMAGE FROM BATTLE (ATTACKER AND DEFENDER) AND SETS PLAYER LIFE//
-		battleCalculation(state, action) {
-			console.log("BATTLE CALCULATION CHECK!");
-			if (!state.attacker.length || !state.defender.length) {
-				console.log("battle CANCELLED");
-				return;
-			}
 
-			if (state.defender[0] === "Direct Attack") {
-				console.log("DIRECT ATK REACHED");
-				if (state.attacker[0].owner === "p1") {
-					state.player2Life = state.player2Life - state.attacker[0].atk;
-					console.log("direct attack hit confirmed!!!");
-				} else if (state.attacker[0].owner === "p2") {
-					state.player1Life = state.player1Life - state.attacker[0].atk;
-					console.log("direct attack hit confirmed!!!");
-				}
-			}
-			//ATTACKER HAS MORE ATK THAN DEFENDERS ATK//
-			if (state.attacker[0].atk > state.defender[0].atk && state.defender[0].position === "atk") {
-				console.log("battle test log");
-				const dmg = state.attacker[0].atk - state.defender[0].atk;
-				console.log("dmg:", dmg);
-				if (state.defender[1] === "cs1") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot1 = [];
-					state.player1FieldSlot1Playing = false;
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.defender[1] === "cs2") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot2 = [];
-					state.player1FieldSlot2Playing = false;
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.defender[1] === "cs3") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot3 = [];
-					state.player1FieldSlot3Playing = false;
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.defender[1] === "cs4") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot1 = [];
-					state.player2FieldSlot1Playing = false;
-					state.player2Life = state.player2Life - dmg;
-				} else if (state.defender[1] === "cs5") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot2 = [];
-					state.player2FieldSlot2Playing = false;
-					state.player2Life = state.player2Life - dmg;
-				} else if (state.defender[1] === "cs6") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot3 = [];
-					state.player2FieldSlot3Playing = false;
-					state.player2Life = state.player2Life - dmg;
-				}
-			}
-			//ATTACKER HAS LESS ATK THAN DEFENDERS ATK //
-			if (state.attacker[0].atk < state.defender[0].atk && state.defender[0].position === "atk") {
-				console.log("battle test log");
-
-				const dmg = state.defender[0].atk - state.attacker[0].atk;
-				console.log("dmg:", dmg);
-				if (state.attacker[1] === "cs1") {
-					state.player1Graveyard.push(state.attacker[0]);
-					state.player1FieldSlot1 = [];
-					state.player1FieldSlot1Playing = false;
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.attacker[1] === "cs2") {
-					state.player1Graveyard.push(state.attacker[0]);
-					state.player1FieldSlot2 = [];
-					state.player1FieldSlot2Playing = false;
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.attacker[1] === "cs3") {
-					state.player1Graveyard.push(state.attacker[0]);
-					state.player1FieldSlot3 = [];
-					state.player1FieldSlot3Playing = false;
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.attacker[1] === "cs4") {
-					state.player2Graveyard.push(state.attacker[0]);
-					state.player2FieldSlot1 = [];
-					state.player2FieldSlot1Playing = false;
-					state.player2Life = state.player2Life - dmg;
-				} else if (state.attacker[1] === "cs5") {
-					state.player2Graveyard.push(state.attacker[0]);
-					state.player2FieldSlot2 = [];
-					state.player2FieldSlot2Playing = false;
-					state.player2Life = state.player2Life - dmg;
-				} else if (state.attacker[1] === "cs6") {
-					state.player2Graveyard.push(state.attacker[0]);
-					state.player2FieldSlot3 = [];
-					state.player2FieldSlot3Playing = false;
-					state.player2Life = state.player2Life - dmg;
-				}
-			}
-			// ATTACKER AND DEFENDER ATK ARE EQUAL - BOTH DESTROYED //
-			if (state.attacker[0].atk === state.defender[0].atk && state.defender[0].position === "atk") {
-				console.log("battle test log");
-
-				if (state.attacker[1] === "cs1") {
-					state.player1Graveyard.push(state.attacker[0]);
-					state.player1FieldSlot1 = [];
-					state.player1FieldSlot1Playing = false;
-				} else if (state.attacker[1] === "cs2") {
-					state.player1Graveyard.push(state.attacker[0]);
-					state.player1FieldSlot2 = [];
-					state.player1FieldSlot2Playing = false;
-				} else if (state.attacker[1] === "cs3") {
-					state.player1Graveyard.push(state.attacker[0]);
-					state.player1FieldSlot3 = [];
-					state.player1FieldSlot3Playing = false;
-				} else if (state.attacker[1] === "cs4") {
-					state.player2Graveyard.push(state.attacker[0]);
-					state.player2FieldSlot1 = [];
-					state.player2FieldSlot1Playing = false;
-				} else if (state.attacker[1] === "cs5") {
-					state.player2Graveyard.push(state.attacker[0]);
-					state.player2FieldSlot2 = [];
-					state.player2FieldSlot2Playing = false;
-				} else if (state.attacker[1] === "cs6") {
-					state.player2Graveyard.push(state.attacker[0]);
-					state.player2FieldSlot3 = [];
-					state.player2FieldSlot3Playing = false;
-				}
-				if (state.defender[1] === "cs1") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot1 = [];
-					state.player1FieldSlot1Playing = false;
-				} else if (state.defender[1] === "cs2") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot2 = [];
-					state.player1FieldSlot2Playing = false;
-				} else if (state.defender[1] === "cs3") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot3 = [];
-					state.player1FieldSlot3Playing = false;
-				} else if (state.defender[1] === "cs4") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot1 = [];
-					state.player2FieldSlot1Playing = false;
-				} else if (state.defender[1] === "cs5") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot2 = [];
-					state.player2FieldSlot2Playing = false;
-				} else if (state.defender[1] === "cs6") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot3 = [];
-					state.player2FieldSlot3Playing = false;
-				}
-			}
-			// ATTACKERS ATK IS MORE THAN DEFENDERS DEF - DEFNDER GETS DESTROYED //
-			if (state.attacker[0].atk > state.defender[0].def && state.defender[0].position === "def") {
-				console.log("battle test log");
-
-				if (state.defender[1] === "cs1") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot1 = [];
-					state.player1FieldSlot1Playing = false;
-				} else if (state.defender[1] === "cs2") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot2 = [];
-					state.player1FieldSlot2Playing = false;
-				} else if (state.defender[1] === "cs3") {
-					state.player1Graveyard.push(state.defender[0]);
-					state.player1FieldSlot3 = [];
-					state.player1FieldSlot3Playing = false;
-				} else if (state.defender[1] === "cs4") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot1 = [];
-					state.player2FieldSlot1Playing = false;
-				} else if (state.defender[1] === "cs5") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot2 = [];
-					state.player2FieldSlot2Playing = false;
-				} else if (state.defender[1] === "cs6") {
-					state.player2Graveyard.push(state.defender[0]);
-					state.player2FieldSlot3 = [];
-					state.player2FieldSlot3Playing = false;
-				}
-			}
-			//ATTACKER HAS LESS ATK THAN DEFENDERS DEF - ATTACKER LOSES DIFFERENCE IN LIFE POINTS //
-			if (state.attacker[0].atk < state.defender[0].def && state.defender[0].position === "def") {
-				console.log("battle test log");
-
-				if (state.attacker[1] === "cs1" || state.attacker[1] === "cs2" || state.attacker[1] === "cs3") {
-					const dmg = state.defender[0].def - state.attacker[0].atk;
-					console.log("dmg:", dmg);
-					state.player1Life = state.player1Life - dmg;
-				} else if (state.attacker[1] === "cs4" || state.attacker[1] === "cs5" || state.attacker[1] === "cs6") {
-					const dmg = state.defender[0].def - state.attacker[0].atk;
-					console.log("dmg:", dmg);
-					state.player2Life = state.player2Life - dmg;
-				}
-			}
-			const fieldSlots = [state.player1FieldSlot1, state.player1FieldSlot2, state.player1FieldSlot3, state.player2FieldSlot1, state.player2FieldSlot2, state.player2FieldSlot3];
-			let attackingCard = fieldSlots.find((card) => card.id === state.attacker[0].id);
-			if (attackingCard) {
-				attackingCard = { ...attackingCard, hasAttacked: true };
-			}
-		},
 		clearAttackerDefender(state) {
 			console.log("cleaaring atker defender");
 			state.attacker = [];
@@ -904,54 +584,86 @@ const playerSlice = createSlice({
 		},
 
 		setPlayerTurn(state, action) {
+			console.log("SET TURN IF NEEDDED CHECK");
 			if (action.payload === "player2") {
-				state.player1Turn = false;
-				state.player2Turn = true;
+				state.player1.isTurn = false;
+				state.player2.isTurn = true;
 			} else if (action.payload === "player1") {
-				state.player2Turn = false;
-				state.player1Turn = true;
+				state.player2.isTurn = false;
+				state.player1.isTurn = true;
 			}
-			state.summonPhase = true;
+			state.gamePhases.summonPhase = true;
 		},
 		setDrawPhase(state, action) {
-			action.payload === true ? (state.drawPhase = true) : (state.drawPhase = false);
+			action.payload === true ? (state.gamePhases.drawPhase = true) : (state.gamePhases.drawPhase = false);
 		},
 		setBattlephase(state, action) {
-			action.payload === true ? (state.battlePhase = true) : (state.battlePhase = false);
+			action.payload === true ? (state.gamePhases.battlePhase = true) : (state.gamePhases.battlePhase = false);
 		},
 		setSummonPhase(state, action) {
-			action.payload === true ? (state.summonPhase = true) : (state.summonPhase = false);
+			action.payload === true ? (state.gamePhases.summonPhase = true) : (state.gamePhases.summonPhase = false);
 		},
 		setHasSummoned(state, action) {
 			action.payload === true ? (state.hasSummoned = true) : (state.hasSummoned = false);
 		},
 		//END TURN LOGIC - CHANGE STATES BACK / RESET HAS ATTACKED BOOLEAN ON PLAYING CARDS / RESET ATTACKER/DEFENDER / INCREASE TURN COUNT //
 		endTurn(state) {
-			state.drawPhase = true;
-			state.battlePhase = false;
-			state.summonPhase = false;
-			state.hasSummoned = false;
+			state.gamePhases.drawPhase = true;
+			state.gamePhases.battlePhase = false;
+			state.gamePhases.summonPhase = false;
+			state.player1.hasSummoned = false;
+			state.player2.hasSummoned = false;
 
-			const fieldSlots = [state.player1FieldSlot1, state.player1FieldSlot2, state.player1FieldSlot3, state.player2FieldSlot1, state.player2FieldSlot2, state.player2FieldSlot3];
-			const updatedCards = fieldSlots.filter((card) => card.hasAttacked === true);
-			updatedCards.forEach((card) => (card.hasAttacked = false));
-
-			// state.attacker = [];
-			// state.defender = [];
-			state.turn = state.turn + 1;
-
-			if (state.player1Turn) {
-				state.player1Turn = false;
-				state.player2Turn = true;
-			} else {
-				state.player1Turn = true;
-				state.player2Turn = false;
+			for (let fs in state.player1.fieldSlots) {
+				if (state.player1.fieldSlots[fs].hasAttacked) {
+					state.player1.fieldSlots[fs].hasAttacked = false;
+				}
 			}
-			console.log("draw:", state.drawPhase, "battle:", state.battlePhase, "summon:", state.summonPhase);
+
+			for (let fs in state.player2.fieldSlots) {
+				if (state.player2.fieldSlots[fs].hasAttacked) {
+					state.player2.fieldSlots[fs].hasAttacked = false;
+				}
+			}
+			state.attacker = {};
+			state.defender = {};
+			state.gamePhases.turn = state.gamePhases.turn + 1;
+
+			if (state.player1.isTurn) {
+				state.player1.isTurn = false;
+				state.player2.isTurn = true;
+			} else if (state.player2.isTurn) {
+				state.player1.isTurn = true;
+				state.player2.isTurn = false;
+			}
 		},
-		setWinner(state) {
-			state.winner = true;
+
+		aiEndTurn(state, action) {
+			state.gamePhases.drawPhase = true;
+			state.gamePhases.battlePhase = false;
+			state.gamePhases.summonPhase = false;
+			state.player2.hasSummoned = false;
+			state.gamePhases.turn = state.gamePhases.turn + 1;
+
+			for (let fs in state.player2.fieldSlots) {
+				if (state.player2.fieldSlots[fs].id) {
+					state.player2.fieldSlots[fs].hasAttacked = false;
+				}
+			}
+
+			state.player1.isTurn = true;
+			state.player2.isTurn = false;
 		},
+		exitGame(state, action) {
+			console.log(state, playerInitialState);
+			state.player1 = playerInitialState.player1;
+			state.player2 = playerInitialState.player2;
+			state.gamePhases = playerInitialState.gamePhases;
+			console.log(state.player1, state.player2);
+		},
+		// setWinner(state) {
+		// 	state.winner = true;
+		// },
 		//********************************************TRIBUTE SUMMON LOGIC*********************************/
 		//SET SELECTED CARD THAT WILL BE TRIBUTE SUMMONED//
 		setSelectedCard(state, action) {
@@ -980,20 +692,10 @@ const playerSlice = createSlice({
 		},
 		selectTributes(state, action) {
 			console.log("select tribute fn fired!");
-			if (action.payload.slotId === "cs1") {
-				state.tributes.push([state.player1FieldSlot1, action.payload.slotId]);
-			} else if (action.payload.slotId === "cs2") {
-				state.tributes.push([state.player1FieldSlot2, action.payload.slotId]);
-			} else if (action.payload.slotId === "cs3") {
-				state.tributes.push([state.player1FieldSlot3, action.payload.slotId]);
-			} else if (action.payload.slotId === "cs4") {
-				state.tributes.push([state.player2FieldSlot1, action.payload.slotId]);
-			} else if (action.payload.slotId === "cs5") {
-				state.tributes.push([state.player2FieldSlot2, action.payload.slotId]);
-			} else if (action.payload.slotId === "cs6") {
-				state.tributes.push([state.player2FieldSlot3, action.payload.slotId]);
-			}
+			const tributes = [...state.tributes, action.payload.card];
+			state.tributes = tributes;
 
+			console.log(state.tributes);
 			if (state.tributes.length === state.selectedCard.tributesRequired) {
 				console.log("tribute arry length check!");
 				state.canTributeSummon = true;
@@ -1001,33 +703,31 @@ const playerSlice = createSlice({
 			}
 		},
 		removeTributedCards(state, action) {
+			const sendToGraveyard = (tribute) => {
+				if (tribute.slot === "p1s1") {
+					state.player1.graveyard.push(state.player1.fieldSlots.fs1);
+					state.player1.fieldSlots.fs1 = {};
+				} else if (tribute.slot === "p1s2") {
+					state.player1.graveyard.push(state.player1.fieldSlots.fs2);
+					state.player1.fieldSlots.fs2 = {};
+				} else if (tribute.slot === "p1s3") {
+					state.player1.graveyard.push(state.player1.fieldSlots.fs3);
+					state.player1.fieldSlots.fs3 = {};
+				} else if (tribute.slot === "p2s1") {
+					state.player2.graveyard.push(state.player2.fieldSlots.fs1);
+					state.player2.fieldSlots.fs1 = {};
+				} else if (tribute.slot === "p2s2") {
+					state.player2.graveyard.push(state.player2.fieldSlots.fs2);
+					state.player2.fieldSlots.fs2 = {};
+				} else if (tribute.slot === "p2s3") {
+					state.player2.graveyard.push(state.player2.fieldSlots.fs3);
+					state.player2.fieldSlots.fs3 = {};
+				}
+			};
 			console.log("remove tribute check");
 			state.tributes.forEach((tribute) => {
-				if (tribute[1] === "cs1") {
-					state.player1Graveyard.push(state.player1FieldSlot1);
-					state.player1FieldSlot1 = [];
-					state.player1FieldSlot1Playing = false;
-				} else if (tribute[1] === "cs2") {
-					state.player1Graveyard.push(state.player1FieldSlot2);
-					state.player1FieldSlot2 = [];
-					state.player1FieldSlot2Playing = false;
-				} else if (tribute[1] === "cs3") {
-					state.player1Graveyard.push(state.player1FieldSlot3);
-					state.player1FieldSlot3 = [];
-					state.player1FieldSlot3Playing = false;
-				} else if (tribute[1] === "cs4") {
-					state.player2Graveyard.push(state.player2FieldSlot1);
-					state.player2FieldSlot1 = [];
-					state.player2FieldSlot1Playing = false;
-				} else if (tribute[1] === "cs5") {
-					state.player2Graveyard.push(state.player2FieldSlot2);
-					state.player2FieldSlot2 = [];
-					state.player2FieldSlot2Playing = false;
-				} else if (tribute[1] === "cs6") {
-					state.player2Graveyard.push(state.player2FieldSlot3);
-					state.player2FieldSlot3 = [];
-					state.player2FieldSlot3Playing = false;
-				}
+				sendToGraveyard(tribute);
+				state.battleLog.push(`${tribute.name} was tributed and sent to the graveyard`);
 			});
 			state.isTributing = false;
 			state.canTributeSummon = false;
@@ -1035,25 +735,8 @@ const playerSlice = createSlice({
 		},
 		//AI LOGIC SETTERS/FUNCTIONS//
 		activateAi(state, action) {
-			action.payload === true ? (state.AiPlaying = true) : (state.AiPlaying = false);
+			action.payload === true ? (state.aiPlaying = true) : (state.aiPlaying = false);
 		},
-		removeCard(state, action) {
-			if (action.payload === "cs4") {
-				state.player2Graveyard.push(state.player2FieldSlot1);
-				state.player2FieldSlot1 = [];
-				state.player2FieldSlot1Playing = false;
-			} else if (action.payload === "cs5") {
-				state.player2Graveyard.push(state.player2FieldSlot2);
-				state.player2FieldSlot2 = [];
-				state.player2FieldSlot2Playing = false;
-			} else if (action.payload === "cs6") {
-				state.player2Graveyard.push(state.player2FieldSlot3);
-				state.player2FieldSlot3 = [];
-				state.player2FieldSlot3Playing = false;
-			}
-		},
-
-		AiBattleCalc(state, action) {},
 
 		setAttackerDefender(state, action) {
 			state.attacker = [...state.attacker, action.payload.attacker, action.payload.atkId];
@@ -1062,17 +745,47 @@ const playerSlice = createSlice({
 		},
 
 		setTributes(state, action) {
-			state.tributes.push(action.payload);
+			state.tributes.push(action.payload.selectedCard);
 			console.log("tributes:", state.tributes);
 		},
 
-		checkForTraps(state) {
-			if (state.player1Turn && (state.player2SpellSlot1Playing || state.player2SpellSlot2Playing || state.player2SpellSlot3Playing)) {
-				console.log("trap menu is open set 1");
-				return true;
-			} else if (state.player2Turn && (state.player1SpellSlot1Playing || state.player1SpellSlot2Playing || state.player1SpellSlot3Playing)) {
-				console.log("trap menu is open set 2");
-				return true;
+		addToBattleLog(state, action) {
+			console.log("add to battle log fired");
+			if (action.payload) {
+				if (action.payload.card) {
+					console.log("activate battle log");
+
+					const owner = action.payload.card.owner === "p1" ? "Player 1" : "Player 2";
+					state.battleLog.push(`${owner} activated ${action.payload.card.name}!`);
+				}
+				if (action.payload.lostLp) {
+					console.log("activate lost lifepoints");
+
+					const player = action.payload.player === "p1" ? "Player 1" : "Player 2";
+					state.battleLog.push(`${player} lost ${action.payload.lostLp} lifepoints!`);
+				}
+				if (action.payload.gainedLp) {
+					console.log("activate gained lifepiints");
+
+					const player = action.payload.player === "p1" ? "Player 1" : "Player 2";
+					state.battleLog.push(`${player} gained ${action.payload.gainedLp} lifepoints!`);
+				}
+				if (action.payload.message) {
+					console.log("BATTLELOG MESSAGE:", `${action.payload.message}`);
+					state.battleLog.push(`${action.payload.message}`);
+				}
+
+				if (action.payload.directTarget) {
+					const target = action.payload.directTarget === "p1" ? "Player 1" : "Player 2";
+
+					state.battleLog.push(`${state.attacker.name} attacked ${target}'s lifepoints directly!`);
+				}
+			} else {
+				if (state.attacker.name && state.defender.name) {
+					console.log("activate attacked log");
+
+					state.battleLog.push(`${state.attacker.name} attacked ${state.defender.name}`);
+				}
 			}
 		},
 	},

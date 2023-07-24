@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CSSTransition from "react-transition-group/CSSTransition";
 import classes from "./Card.module.css";
 
@@ -8,7 +8,7 @@ const Card = (props) => {
 	let cardClasses = `${classes.card}`;
 
 	if (props.position === "def") {
-		cardClasses = `${classes.card} ${classes.faceDownCard} ${classes.defencePosition} `;
+		cardClasses = `${classes.faceDownCard} ${classes.defencePosition} `;
 	}
 	if (props.type === "spell") {
 		cardClasses = `${classes.card} ${classes.spellCard}`;
@@ -17,7 +17,7 @@ const Card = (props) => {
 		cardClasses = `${classes.card} ${classes.trapCard}`;
 	}
 	if (props.trapSet) {
-		cardClasses = `${classes.card} ${classes.trapCard} ${classes.faceDownCard}`;
+		cardClasses = `  ${classes.faceDownCard}`;
 	}
 
 	if (props.clicked) {
@@ -41,18 +41,22 @@ const Card = (props) => {
 	}
 	if (props.className === "displayedTrapCard") {
 		if (props.clicked) {
-			console.log("click pass check");
 			cardClasses = ` ${classes.displayedTrapCard} ${classes.cardClicked}`;
 		} else {
-			cardClasses = `${classes.displayedTrapCard}`;
+			cardClasses = `${classes.displayedTrapCard} `;
 		}
 	}
 
+	const getCardId = () => {
+		console.log("getCardId FN fired ");
+		props.getId(props.id);
+	};
+
+	const clickHandler = props.getId ? getCardId : props.onClick;
+
 	return (
-		<div className={cardClasses}>
-			<div className={classes.clickLayer} onClick={props.onClick}></div>
+		<div className={`${cardClasses} ${props.className}`} style={props.zIndex ? { zIndex: props.zIndex } : { zIndex: 1 }} onClick={clickHandler}>
 			<div className={cardNameClasses}>{props.name}</div>
-			<div className={classes.rating}></div>
 			<img alt="card monster" src={props.src} className={classes.cardImage} />
 			<div className={classes.stats}>
 				{props.type === "monster" && <div className={classes.atkStat}>{props.atk}</div>}

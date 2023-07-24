@@ -3,19 +3,13 @@
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-end;
+	justify-content: center;
 	text-align: center;
 	/* border: 1px solid #fff; */
 }
 
-.menu h2 {
-	color: white;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	margin: 10px auto 0;
-	text-decoration: underline;
+.matchInfo {
+	display: flex;
 }
 
 .menuBar {
@@ -26,15 +20,24 @@
 	justify-content: center;
 	align-items: center;
 	margin: 0 auto 30px;
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.4);
 }
 
 .menuBar:hover {
-	background: rgba(0, 0, 0, 0.5);
-	color: black;
+	background: rgba(0, 0, 0, 1);
+	border-color: goldenrod;
+}
+
+.menuBar:hover p {
+	color: goldenrod;
 }
 
 .menuBar:active {
 	transform: scale(0.95);
+	background: rgba(0, 0, 0, 1);
+	border-color: goldenrod;
+	color: goldenrod;
 }
 
 .battlePhaseBar,

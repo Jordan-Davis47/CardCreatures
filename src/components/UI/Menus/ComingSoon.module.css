@@ -1,0 +1,19 @@
+.title {
+	color: white;
+}
+
+.list {
+	list-style: none;
+	color: white;
+	font-size: 1.2rem;
+	padding: 0 5%;
+}
+
+.list li {
+	margin: 15px 0;
+}
+
+.featuresContainer button {
+	width: 100%;
+	padding: 0;
+}
