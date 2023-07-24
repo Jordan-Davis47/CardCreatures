@@ -22,7 +22,7 @@ const Login = (props) => {
 
 	const submitHandler = async (setSubmitting, values) => {
 		try {
-			const response = await sendRequest("http://localhost:9000/api/users/login", "post", values, { "Content-type": "application/json" });
+			const response = await sendRequest("http://cardcreatures-backend/api/users/login", "post", values, { "Content-type": "application/json" });
 			console.log(response);
 			setSubmitting(false);
 

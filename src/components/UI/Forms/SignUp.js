@@ -20,7 +20,7 @@ const SignUp = (props) => {
 	}, [isLoggedIn, closeForm]);
 
 	const submitHandler = async (setSubmitting, values) => {
-		const response = await sendRequest("http://localhost:9000/api/users/signup", "post", values, { "Content-type": "application/json" });
+		const response = await sendRequest("http://cardcreatures-backend/api/users/signup", "post", values, { "Content-type": "application/json" });
 		setSubmitting(false);
 		console.log(response);
 		auth.login({ userId: response.data.user.id, username: response.data.user.username, token: response.data.user.token });
