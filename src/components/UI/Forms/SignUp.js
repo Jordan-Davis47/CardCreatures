@@ -20,6 +20,7 @@ const SignUp = (props) => {
 	}, [isLoggedIn, closeForm]);
 
 	const submitHandler = async (setSubmitting, values) => {
+		console.log(process.env.REACT_APP_BACKEND_URL);
 		const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/signup`, "post", values, { "Content-type": "application/json" });
 		setSubmitting(false);
 		console.log(response);
