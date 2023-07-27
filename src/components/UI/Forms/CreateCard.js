@@ -64,7 +64,7 @@ const CreateCard = (props) => {
 			showError({ title: "Creating Card", message: "Failed to create card, please try again" });
 		}
 		try {
-			const response = await sendRequest("http://localhost:9000/api/deck/createCard", "post", card, { "Content-type": "application/json" });
+			const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/createCard`, "post", card, { "Content-type": "application/json" });
 			console.log(response.data.message);
 			console.log(response);
 			showSuccess({ title: "Create Card", message: "Successfully created card!" });
@@ -72,18 +72,6 @@ const CreateCard = (props) => {
 			showError({ title: "Creating Card", message: "Failed to create card, please try again" });
 		}
 	};
-
-	// const editCardHandler = async (card) => {
-	// 	showPending({ title: "Edit Card", message: "Editing card, please wait..." });
-	// 	try {
-	// 		const response = await sendRequest(`http://localhost:9000/api/deck/card/${props.card._id}`, "patch", card, { "Content-type": "application/json" });
-	// 		console.log(response.data.message);
-	// 		console.log(response);
-	// 		showSuccess({ title: "Edit Card", message: "Successfully Edited card!" });
-	// 	} catch (err) {
-	// 		showError({ title: "Edit Card", message: "Failed to edit card, please try again" });
-	// 	}
-	// };
 
 	function onSubmitHandler(card, file) {
 		console.log("CARD:", card);
@@ -107,7 +95,7 @@ const CreateCard = (props) => {
 		if (auth.isLoggedIn) {
 			const getUserPoints = async () => {
 				try {
-					const response = await sendRequest(`http://localhost:9000/api/users/deckPoints/${auth.userId}`, "get");
+					const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/deckPoints/${auth.userId}`, "get");
 					console.log(response);
 					console.log(response.data);
 					setDeckPoints(response.data.deckPoints);

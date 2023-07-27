@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect, useContext } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useAxios } from "../../../../hooks/axios-hook";
 import { playerActions } from "../../../../store/index";
 import { standardDecks } from "../../../Decks/Decks";
@@ -9,7 +9,6 @@ import ViewDecksDisplay from "./ViewDecksDisplay";
 import Modal from "../../Modal";
 
 import classes from "./DeckSelectMenu.module.css";
-// const classes = {};
 
 const DeckSelectMenu = (props) => {
 	const dispatch = useDispatch();
@@ -25,7 +24,6 @@ const DeckSelectMenu = (props) => {
 	const natureDeck = standardDecks[1].cards;
 
 	const getCards = async (deckId) => {
-		console.log(deckId);
 		if (deckIsSelected) {
 			return;
 		}
@@ -46,9 +44,7 @@ const DeckSelectMenu = (props) => {
 				setPlayer2Choice(standardDecks[1].name);
 			}
 		} else {
-			console.log(deckId);
-			const response = await sendRequest(`http://localhost:9000/api/deck/${deckId}`, "get");
-			console.log(response);
+			const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/${deckId}`, "get");
 			if (props.matchType === "Single Player" || !player1Deck.length) {
 				setPlayer1Deck(response.data.cards);
 				setPlayer1Choice(response.data.deckName);
@@ -80,7 +76,6 @@ const DeckSelectMenu = (props) => {
 
 	useEffect(() => {
 		if (player1Deck.length & player2Deck.length) {
-			console.log("length passed");
 			setDeckIsSelected(true);
 		}
 	}, [player1Deck.length, player2Deck.length]);

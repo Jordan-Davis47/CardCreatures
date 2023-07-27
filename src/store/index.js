@@ -124,13 +124,7 @@ const playerSlice = createSlice({
 		drawCard(state, action) {
 			if (action.payload) {
 				console.log("draw", action.payload.drawAmount);
-				// if (state.aiPlaying && action.payload.owner === 'p2') {
-				// 	const deck = state.player2.deck;
-				// 	for (let i = 0; i < action.payload.drawAmount; i++) {
-				// 		const card = deck.shift();
-				// 		state.player2.hand.push(card);
-				// 	}
-				// }
+
 				if (state.player1.isTurn) {
 					console.log(state.player1.deck);
 					for (let i = 0; i < action.payload.drawAmount; i++) {
@@ -165,10 +159,8 @@ const playerSlice = createSlice({
 					state.gamePhases.summonPhase = true;
 					return;
 				}
-				// console.log("p2handb4:", state.player2.hand);
 				const card = state.player2.deck.shift();
 				state.player2.hand.push(card);
-				// console.log("p2handafter:", state.player2.hand);
 
 				state.gamePhases.drawPhase = false;
 				state.gamePhases.summonPhase = true;
@@ -226,8 +218,8 @@ const playerSlice = createSlice({
 						state.battleLog.push(`Player 1 summoned a monster in defence position`);
 					} else {
 						state.battleLog.push(`Player 1 summoned ${card.name} to the field`);
-					} // state.player1.hasSummoned = true;
-					// state.hasSummoned = true;
+					}
+					state.player1.hasSummoned = true;
 				} else if (!state.player1.fieldSlots.fs2.owner && !state.player1.hasSummoned && state.gamePhases.summonPhase) {
 					const card = { ...action.payload.card, slot: "p1s2", isPlaying: true };
 					state.player1.fieldSlots.fs2 = card;
@@ -237,7 +229,7 @@ const playerSlice = createSlice({
 					} else {
 						state.battleLog.push(`Player 1 summoned ${card.name} to the field`);
 					}
-					// state.player1.hasSummoned = true;
+					state.player1.hasSummoned = true;
 				} else if (!state.player1.fieldSlots.fs3.owner && !state.player1.hasSummoned && state.gamePhases.summonPhase) {
 					const card = { ...action.payload.card, slot: "p1s3", isPlaying: true };
 					state.player1.fieldSlots.fs3 = card;
@@ -247,7 +239,7 @@ const playerSlice = createSlice({
 					} else {
 						state.battleLog.push(`Player 1 summoned ${card.name} to the field`);
 					}
-					// state.player1.hasSummoned = true;
+					state.player1.hasSummoned = true;
 				} else {
 					console.log("cant place anymore cards this turn");
 					return;

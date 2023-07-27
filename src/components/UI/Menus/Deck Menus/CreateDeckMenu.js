@@ -19,7 +19,7 @@ const CreateDeckMenu = (props) => {
 	const sendDeckData = async (name, userId) => {
 		showPending({ title: "Create Deck", message: "Creating new deck, please wait..." });
 		console.log(deckName);
-		const response = await sendRequest("http://localhost:9000/api/deck/createDeck", "post", { name, userId }, { "Content-Type": "application/json" });
+		const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/createDeck`, "post", { name, userId }, { "Content-Type": "application/json" });
 
 		console.log(response);
 		if (response.status === 201) {

@@ -1,9 +1,7 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import DeckSelectMenu from "../Deck Menus/DeckSelectMenu";
 import Container from "../../Layout/Container";
-import classes from "./DuelMenu.module.css";
 import Button from "../../Button";
-import ViewDecksDisplay from "../Deck Menus/ViewDecksDisplay";
 
 const DuelMenu = (props) => {
 	const [showDeckMenu, setShowDeckMenu] = useState(false);

@@ -9,8 +9,8 @@ export const useAuth = () => {
 	const [username, setUsername] = useState(false);
 
 	const login = useCallback((authObj) => {
-		console.log(token);
-		setToken(token);
+		console.log(authObj);
+		setToken(authObj.token);
 		setUserId(authObj.userId);
 		setUsername(authObj.username);
 		const tokenExpirationDate = authObj.expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);

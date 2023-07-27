@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import CSSTransition from "react-transition-group/CSSTransition";
+import React from "react";
 import classes from "./Card.module.css";
 
 const Card = (props) => {

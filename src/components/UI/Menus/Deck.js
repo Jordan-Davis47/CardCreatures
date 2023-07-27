@@ -1,6 +1,5 @@
-import { Fragment, useState } from "react";
-
 import classes from "./Deck Menus/DeckSelectMenu.module.css";
+
 let deckClasses = "";
 const Deck = (props) => {
 	if (props.isClicked) {

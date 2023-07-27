@@ -1,10 +1,8 @@
-import React, { Fragment } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 
 import Card from "../Card";
-import Button from "./Button";
 
-import { playerActions } from "../../store/index";
 import { ReactComponent as AtkPosIcon } from "../../Images/Icons/AtkPosIcon.svg";
 import { ReactComponent as DefPosIcon } from "../../Images/Icons/defPosIcon.svg";
 import { ReactComponent as SpellIcon } from "../../Images/Icons/spellIcon.svg";

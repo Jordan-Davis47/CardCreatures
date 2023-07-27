@@ -30,11 +30,6 @@ const useHand = () => {
 			console.log("SELECTED CARD IF CHECK");
 			setHasSelectedCard(true);
 		}
-
-		// if (props.turn && card.owner === props.id) {
-		// 	setHasSelectedCard(true);
-		// 	// inspect = true;
-		// }
 	};
 
 	const PlaceCardDown = (event) => {
@@ -61,7 +56,6 @@ const useHand = () => {
 		}
 
 		if (cardCopy.type === "spell") {
-			console.log("spell checkkkkk");
 			dispatch(playerActions.placeCard({ card: cardCopy, player }));
 			return;
 		}

@@ -13,15 +13,15 @@ const ViewDecksDisplay = (props) => {
 	const auth = useContext(AuthContext);
 	const { showError, showPending, showSuccess } = useNotification();
 	const [deckList, setDeckList] = useState("");
-	const [deckId, setDeckId] = useState(""); //ID of deck to be viewed or deleted//
-	const { sendRequest, isLoading, error } = useAxios();
+	const [deckId, setDeckId] = useState("");
+	const { sendRequest, isLoading } = useAxios();
 	const [sortedByLength, setSortedByLength] = useState(false);
 
 	const userId = auth.userId;
 	useEffect(() => {
 		//function to get list of decks and deckID belonging to user//
 		const getDeckList = async () => {
-			const response = await sendRequest(`http://localhost:9000/api/deck/user/${userId}`, "get");
+			const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/user/${userId}`, "get");
 			const listOfDecks = response.data.decks;
 			console.log(response);
 			console.log(response.data.decks);
@@ -44,7 +44,7 @@ const ViewDecksDisplay = (props) => {
 			console.log("delete handler reached");
 			showPending({ title: "Delete Deck", message: "Deleting deck, please wait..." });
 			try {
-				const response = await sendRequest(`http://localhost:9000/api/deck/${deckId}`, "delete");
+				const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/${deckId}`, "delete");
 				console.log(response, response.message);
 				console.log(response);
 				const updatedDeckList = deckList.filter((deck) => deck.id !== deckId);

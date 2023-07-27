@@ -1,11 +1,10 @@
-import React, { Fragment, useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 
 import AuthContext from "../../../../context/auth-context";
 
 import Button from "../../Button";
 import CreateCard from "../../Forms/CreateCard";
-import Modal from "../../Modal";
-import PopUpBox from "../../PopUpBox";
+
 import CreateDeckMenu from "./CreateDeckMenu";
 import ViewDecksDisplay from "./ViewDecksDisplay";
 import ViewCards from "../ViewCards";

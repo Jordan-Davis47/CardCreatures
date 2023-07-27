@@ -22,12 +22,14 @@ const Login = (props) => {
 
 	const submitHandler = async (setSubmitting, values) => {
 		try {
-			const response = await sendRequest("https://cardcreatures-backend.vercel.app/api/users/login", "post", values, { "Content-type": "application/json" });
+			console.log("LOGIN ATTEMPT REQUEST SENT");
+			const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/login`, "post", values, { "Content-type": "application/json" });
 			console.log(response);
 			setSubmitting(false);
 
 			console.log(response.data.user.username);
-			auth.login({ userId: response.data.user.id, username: response.data.user.username, token: response.data.user.token });
+			const authObj = { userId: response.data.user.id, username: response.data.user.username, token: response.data.user.token };
+			auth.login(authObj);
 			console.log(auth.isLoggedIn);
 			closeForm();
 		} catch (err) {

@@ -22,12 +22,9 @@ const Winner = (props) => {
 	const aiNames = ["The Duel Master", "Kid Joey", "Oh-Gi-Yu", "Cloud", "Joel Miller", "Ellie Williams"];
 	const randAiName = aiNames[Math.floor(Math.random() * aiNames.length)];
 
-	console.log(player1.lifePoints, player2.lifePoints);
-	console.log(auth);
-
 	useEffect(() => {
 		const sendStats = async (isWin) => {
-			const response = await sendRequest("http://localhost:3000/api/users/updateStats", "post", { uid: auth.userId, win: isWin, token: auth.token });
+			const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/updateStats`, "post", { uid: auth.userId, win: isWin, token: auth.token });
 			console.log(response);
 			return response;
 		};

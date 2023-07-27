@@ -159,7 +159,7 @@ export const standardDecks = [
 				img: ColoredEgg,
 				id: 46,
 				type: "spell",
-				cardDescription: "Draw 2 cards",
+				cardDescription: "Hatch a rare dragon egg imbued with the magic of the mythical beasts: Draw 2 cards",
 				effect: {
 					type: "draw",
 					amount: 2,

@@ -8,7 +8,7 @@ import LoadingSpinner from "../LoadingSpinner";
 
 import classes from "./Leaderboard.module.css";
 
-const getRankingsUrl = "http://localhost:9000/api/users/leaderboard";
+const getRankingsUrl = `${process.env.REACT_APP_BACKEND_URL}/users/leaderboard`;
 
 const Leaderboard = (props) => {
 	const { sendRequest, isLoading } = useAxios();

@@ -1,16 +1,14 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState } from "react";
 
 import { useAxios } from "../../../hooks/axios-hook";
 import useNotification from "../../../hooks/notification-hook";
 import Card from "../../Card";
-import Modal from "../Modal";
 import CardDisplay from "../CardDisplay";
 import ViewDecksDisplay from "./Deck Menus/ViewDecksDisplay";
 import Button from "../Button";
 
 import classes from "./ViewCards.module.css";
-import PopUpBox from "../PopUpBox";
-import CreateCard from "../Forms/CreateCard";
+
 import CardForm from "../Forms/CreateCard Form/CardForm";
 import LoadingSpinner from "../LoadingSpinner";
 
@@ -33,15 +31,13 @@ const ViewCards = (props) => {
 
 	const getCards = async (deckId) => {
 		console.log(deckId);
-		const response = await sendRequest(`http://localhost:9000/api/deck/${deckId}`, "get");
+		const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/${deckId}`, "get");
 		setCards(response.data.cards);
 		setShowList(true);
 	};
 
 	const deleteCardHandler = () => {
-		const response = sendRequest(`http://localhost:9000/api/deck/card/${cardId}`, "delete");
-		// console.log(response);
-		// console.log(response.data.message);
+		const response = sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/card/${cardId}`, "delete");
 		const updatedCards = cards.filter((card) => card._id !== cardId);
 		setCards(updatedCards);
 		setShowFocusedCard(false);
@@ -73,7 +69,7 @@ const ViewCards = (props) => {
 			}
 		}
 
-		const response = await sendRequest(`http://localhost:9000/api/deck/card/${cardId}`, "patch", card, { "Content-type": "application/json" });
+		const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/deck/card/${cardId}`, "patch", card, { "Content-type": "application/json" });
 		console.log("RESPONSE:", response);
 		if (response.status === 200) {
 			showSuccess({ title: "Edit Card", message: "Successfully edited card!" });

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 
 import Button from "../Button";
 import classes from "./MainMenu.module.css";
