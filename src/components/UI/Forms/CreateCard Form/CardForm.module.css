@@ -25,6 +25,13 @@
 	cursor: pointer;
 }
 
+.points {
+	text-align: center;
+	font-weight: bold;
+	position: relative;
+	/* top: 10px; */
+}
+
 .middleContainer {
 	height: 100%;
 	display: flex;
@@ -163,7 +170,7 @@ input[type="file"] {
 @media (min-width: 800px) {
 	.middleContainer {
 		width: 65%;
-		align-items: center;
+		/* align-items: center; */
 		gap: 5%;
 	}
 }

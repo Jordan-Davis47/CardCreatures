@@ -113,12 +113,12 @@ const ViewDecksDisplay = (props) => {
 					{!props.createCard && !props.forDeletion && !props.forView && standardDecks.map((deck, index) => <Deck listStyle key={index} id={deck.name} name={deck.name} getDeckId={getDeckId} />)}
 
 					{auth.isLoggedIn && (
-						<Fragment>
+						<div>
 							<p>Custom Decks</p>
 							{isLoading && <LoadingSpinner />}
-							{!isLoading && deckList.length && deckList.map((deck, index) => <Deck listStyle key={index} id={deck.id} name={deck.name.toUpperCase()} getDeckId={getDeckId} />)}
-							{!deckList.length && !isLoading && <p className={classes.message}>No custom decks </p>}
-						</Fragment>
+							{!isLoading && deckList.length && deckList.map((deck, index) => <Deck listStyle key={deck.id} id={deck.id} name={deck.name.toUpperCase()} getDeckId={getDeckId} />)}
+							{!deckList.length && !isLoading && <p className={classes.message}>No custom decks</p>}
+						</div>
 					)}
 				</ul>
 			</div>

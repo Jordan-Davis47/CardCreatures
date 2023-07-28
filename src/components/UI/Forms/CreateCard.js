@@ -115,7 +115,7 @@ const CreateCard = (props) => {
 			{showDeckList && <ViewDecksDisplay createCard getDeckId={getDeckId} back={props.back} />}
 			{showCardCreateFrom && (
 				<div className={classes.createDeckMenu}>
-					<CardForm onSubmit={onSubmitHandler} onBack={cardCreateFormBackHandler} initialValue={initialValues} deckId={deckId} />
+					<CardForm onSubmit={onSubmitHandler} onBack={cardCreateFormBackHandler} initialValue={initialValues} deckId={deckId} points={deckPoints} />
 				</div>
 			)}
 		</Fragment>

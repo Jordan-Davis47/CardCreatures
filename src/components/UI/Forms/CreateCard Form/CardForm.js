@@ -5,10 +5,8 @@ import Button from "../../Button";
 import Card from "../../../Card";
 
 import classes from "./CardForm.module.css";
-import ImageUpload from "./ImageUpload";
 
 const CardForm = (props) => {
-	const { initialValue } = props;
 	console.log(props.initialValue);
 
 	const [cardName, setCardName] = useState(props.initialValue ? props.initialValue.name : "");
@@ -22,7 +20,7 @@ const CardForm = (props) => {
 	const [spellType, setSpellType] = useState("heal");
 	const [spellStat, setSpellStat] = useState("atk");
 
-	const [deckPoints, setDeckPoints] = useState(0);
+	const [deckPoints, setDeckPoints] = useState(props.points);
 	const [file, setFile] = useState(null);
 	const [imgIsValid, setImgIsValid] = useState(false);
 	const [previewUrl, setPreviewUrl] = useState(false);
@@ -42,12 +40,7 @@ const CardForm = (props) => {
 			setCardName(e.target.value);
 		}
 	}
-	function cardAtkHandler(e) {
-		setCardAtk(e.target.value);
-	}
-	function cardDefHandler(e) {
-		setCardDef(e.target.value);
-	}
+
 	function cardDescriptionHandler(e) {
 		setCardDescription(e.target.value);
 	}
@@ -56,37 +49,35 @@ const CardForm = (props) => {
 	}
 	function amountDecrementHandler() {
 		if (spellAmount - 100 >= 0 && deckPoints - 100 >= 0) {
-			setDeckPoints((prevCount) => prevCount - 100);
+			setDeckPoints((prevCount) => prevCount + 200);
 			setSpellAmount((prevState) => prevState - 100);
 		} else {
 			console.log("NOPE");
 		}
 	}
 	function amountIncrementHandler() {
-		// if (spellAmount + 100 <= 500 && deckPoints - 100 >= 0) {
-		setDeckPoints((prevCount) => prevCount - 100);
-		setSpellAmount((prevState) => prevState + 100);
-		// } else {
-		// 	console.log("NOPE");
-		// }
+		if (spellAmount + 100 <= 500 && deckPoints - 100 >= 0) {
+			setDeckPoints((prevCount) => prevCount - 200);
+			setSpellAmount((prevState) => prevState + 100);
+		}
 	}
 	function atkIncrementHandler() {
-		// if (cardAtk + 100 <= 3000 && deckPoints - 100 >= 0) {
-		setDeckPoints((prevCount) => prevCount - 100);
-		setCardAtk((prevState) => prevState + 100);
-		// }
+		if (cardAtk + 100 <= 3000 && deckPoints - 100 >= 0) {
+			setDeckPoints((prevCount) => prevCount - 100);
+			setCardAtk((prevState) => prevState + 100);
+		}
 	}
 	function atkDecrementHandler() {
 		if (cardAtk - 100 >= 0 && deckPoints - 100 >= 0 && deckPoints - 100 >= 0) {
-			setDeckPoints((prevCount) => prevCount - 100);
+			setDeckPoints((prevCount) => prevCount + 100);
 			setCardAtk((prevState) => prevState - 100);
 		} else {
 			console.log("not enough");
 		}
 	}
 	function defDecrementHandler() {
-		if (cardDef - 100 >= 0 && props.deckPoints - 100 >= 0 && deckPoints - 100 >= 0) {
-			setDeckPoints((prevCount) => prevCount - 100);
+		if (cardDef - 100 >= 0 && deckPoints - 100 >= 0 && deckPoints - 100 >= 0) {
+			setDeckPoints((prevCount) => prevCount + 100);
 			setCardDef((prevState) => prevState - 100);
 		} else {
 			console.log("not enough");
@@ -115,8 +106,7 @@ const CardForm = (props) => {
 		const negate = e.target.value === "false" ? false : true;
 		console.log(e.target.value);
 
-		// if (negate && deckPoints - 500 >= 0) {
-		if (negate) {
+		if (negate && deckPoints - 500 >= 0) {
 			setDeckPoints((prevState) => prevState - 500);
 			setHasNegate(negate);
 		} else if (!negate) {
@@ -128,6 +118,7 @@ const CardForm = (props) => {
 	const submitFormHandler = (e) => {
 		e.preventDefault();
 		console.log(card, file, currentImg);
+		card.newDeckPoints = deckPoints;
 		if (!file & currentImg) {
 			props.onSubmit(card, currentImg);
 		} else {
@@ -199,8 +190,8 @@ const CardForm = (props) => {
 		trapBtnClasses = `${classes.cardTypeSelect} ${classes.active}`;
 	}
 
-	// const canCreate = cardName.trim() !== "" && cardDescription.trim() !== "";
-	const canCreate = "name";
+	const canCreate = cardName.trim() !== "" && cardDescription.trim() !== "";
+	// const canCreate = "name";
 
 	console.log(currentImg, file, previewUrl);
 
@@ -220,6 +211,7 @@ const CardForm = (props) => {
 						</button>
 					</div>
 				</div>
+				<p className={classes.points}>Deck Points: {deckPoints}</p>
 				<div className={classes.middleContainer}>
 					{(cardType === "spell" || cardType === "trap") && (
 						<div className={classes.formControl}>

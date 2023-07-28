@@ -1,5 +1,6 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect, useContext } from "react";
 
+import AuthContext from "../../../context/auth-context";
 import { useAxios } from "../../../hooks/axios-hook";
 import useNotification from "../../../hooks/notification-hook";
 import Card from "../../Card";
@@ -13,6 +14,7 @@ import CardForm from "../Forms/CreateCard Form/CardForm";
 import LoadingSpinner from "../LoadingSpinner";
 
 const ViewCards = (props) => {
+	const auth = useContext(AuthContext);
 	const { sendRequest, isLoading } = useAxios();
 	const { showSuccess, showPending, showError } = useNotification();
 	const [cards, setCards] = useState(null);
@@ -22,6 +24,26 @@ const ViewCards = (props) => {
 	const [showEditCard, setShowEditCard] = useState(false);
 	const [cardId, setCardId] = useState("");
 	const [deckId, setDeckId] = useState(null);
+	const [deckPoints, setDeckPoints] = useState(null);
+	const [reloadPoints, setReloadPoints] = useState(true);
+
+	useEffect(() => {
+		if (reloadPoints) {
+			const getUserPoints = async () => {
+				try {
+					const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/deckPoints/${auth.userId}`, "get");
+					console.log(response);
+					console.log(response.data);
+					setDeckPoints(response.data.deckPoints);
+				} catch (err) {
+					console.log(err);
+					showError({ title: "Error", message: "Error retrieving user data" });
+				}
+				setReloadPoints(false);
+			};
+			getUserPoints();
+		}
+	}, [sendRequest, auth.userId, showError, reloadPoints]);
 
 	const closeFormHandler = () => {
 		setShowEditCard(false);
@@ -75,6 +97,8 @@ const ViewCards = (props) => {
 			showSuccess({ title: "Edit Card", message: "Successfully edited card!" });
 			setShowList(true);
 			setShowEditCard(false);
+			getCards(deckId);
+			setReloadPoints(true);
 		}
 	};
 
@@ -129,7 +153,7 @@ const ViewCards = (props) => {
 
 	return (
 		<Fragment>
-			{isLoading && <LoadingSpinner />}
+			{isLoading && !showEditCard && <LoadingSpinner />}
 			{!isLoading && !cards && <ViewDecksDisplay forView getDeckId={loadCards} back={props.back} />}
 			{!showEditCard && cards && (
 				<div className={classes.container}>
@@ -141,7 +165,7 @@ const ViewCards = (props) => {
 
 			{showEditCard && (
 				<div className={classes.formContainer}>
-					<CardForm initialValue={initialValues} deckId={deckId} onBack={closeFormHandler} onSubmit={submitFormHandler} forEdit />
+					<CardForm initialValue={initialValues} deckId={deckId} onBack={closeFormHandler} onSubmit={submitFormHandler} points={deckPoints} forEdit />
 				</div>
 			)}
 

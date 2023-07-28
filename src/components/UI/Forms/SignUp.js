@@ -1,4 +1,6 @@
 import { Fragment, useState, useContext, useEffect } from "react";
+
+import useNotification from "../../../hooks/notification-hook";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -9,6 +11,7 @@ import AuthContext from "../../../context/auth-context";
 
 const SignUp = (props) => {
 	const { sendRequest, isLoading, error } = useAxios();
+	const { showError, showPending, showSuccess } = useNotification();
 	const auth = useContext(AuthContext);
 	const isLoggedIn = auth.isLoggedIn;
 
@@ -20,12 +23,17 @@ const SignUp = (props) => {
 	}, [isLoggedIn, closeForm]);
 
 	const submitHandler = async (setSubmitting, values) => {
-		console.log(process.env.REACT_APP_BACKEND_URL);
-		const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/signup`, "post", values, { "Content-type": "application/json" });
-		setSubmitting(false);
-		console.log(response);
-		auth.login({ userId: response.data.user.id, username: response.data.user.username, token: response.data.user.token });
-		closeForm();
+		showPending({ title: "Signing up", message: "Creating new user, please wait..." });
+		try {
+			const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/signup`, "post", values, { "Content-type": "application/json" });
+			setSubmitting(false);
+			console.log(response);
+			auth.login({ userId: response.data.user.id, username: response.data.user.username, token: response.data.user.token });
+			showSuccess({ title: "Signing up", message: "Successfully created new user!" });
+			closeForm();
+		} catch (err) {
+			showError({ title: "Signing up", message: "Creating new user failed, please try again" });
+		}
 	};
 
 	return (

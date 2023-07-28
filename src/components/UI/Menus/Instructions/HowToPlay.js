@@ -43,9 +43,6 @@ const HowToPlay = (props) => {
 
 	return (
 		<Fragment>
-			<Button className={classes.backBtn} onClick={goBackHandler}>
-				Back
-			</Button>
 			<div className={classes.menu}>
 				<div className={classes.headers}>
 					<div onClick={objectiveActiveHandler} className={classes.headerTab}>
@@ -60,6 +57,9 @@ const HowToPlay = (props) => {
 				</div>
 				<div className={classes.content}>{content}</div>
 			</div>
+			<Button className={classes.backBtn} onClick={goBackHandler}>
+				Back
+			</Button>
 		</Fragment>
 	);
 };

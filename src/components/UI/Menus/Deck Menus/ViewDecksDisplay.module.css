@@ -43,7 +43,6 @@
 
 .decksContainer ul {
 	list-style: none;
-	/* border: white 2px solid; */
 	padding: 10% 0 10% 0;
 	width: fit-content;
 	display: flex;

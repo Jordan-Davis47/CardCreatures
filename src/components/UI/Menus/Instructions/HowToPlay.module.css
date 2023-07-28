@@ -2,8 +2,10 @@
 	position: relative;
 	width: 80vw;
 	height: 80vh;
-	border: solid white 2px;
+	border: solid goldenrod 2px;
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
 	display: flex;
+	top: 2%;
 }
 
 .headers {
@@ -12,7 +14,7 @@
 }
 
 .headerTab {
-	border: 1px solid white;
+	border: 1px solid goldenrod;
 	border-top: none;
 	height: 10%;
 	display: flex;
@@ -40,6 +42,16 @@
 	overflow-y: scroll;
 }
 
+.objectiveSection,
+.typesOfCardsSection,
+.battleGuideSection {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	height: 90%;
+	/* padding: 2%; */
+}
+
 .objectiveSection h3,
 .typesOfCardsSection h3,
 .battleGuideSection h3 {
@@ -62,25 +74,14 @@
 
 .backBtn {
 	position: absolute;
-	bottom: 3vh;
+	bottom: 10px;
 	left: 0;
 	right: 0;
-	margin: auto;
-	width: 70%;
-	max-width: 160px;
-	height: 30px;
-	background-color: rgba(255, 255, 255, 0);
-	border: 2px solid white;
-	border-radius: 8px;
+	margin: 0 auto;
+	cursor: pointer;
+	border: 2px solid goldenrod;
+	background: radial-gradient(circle, rgba(24, 24, 24, 1) 9%, rgba(21, 21, 21, 1) 50%, rgba(37, 37, 38, 1) 93%, rgba(33, 34, 34, 1) 100%);
 	color: white;
-	font-weight: 600;
-}
-
-.backBtn:hover {
-	background-color: white;
-	color: black;
-}
-
-.backBtn:active {
-	transform: scale(0.95);
+	width: 100px;
+	height: 35px;
 }
