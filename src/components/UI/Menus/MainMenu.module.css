@@ -1,7 +1,9 @@
 .mainMenu {
 	display: grid;
 	width: 80%;
+	max-width: 1600px;
 	height: 70%;
+	max-height: 800px;
 	grid-template-columns: 200px 1fr 1fr;
 	grid-template-rows: 80px 1fr 1fr 100px;
 	grid-gap: 1rem;
