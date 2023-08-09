@@ -281,7 +281,7 @@ export const standardDecks = [
 				type: "monster",
 				position: null,
 				hasAttacked: false,
-				cardDescription: "",
+				cardDescription: "A dragon carved from the magnificent stone, dazzling and deadly as it soars over its world",
 			},
 
 			{
