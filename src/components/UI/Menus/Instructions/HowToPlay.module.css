@@ -24,6 +24,14 @@
 	cursor: pointer;
 }
 
+.headerTab:hover p {
+	color: goldenrod;
+}
+
+.headerTab:active {
+	transform: scale(0.98);
+}
+
 .headerTab:nth-of-type(1) {
 	border-left: none;
 }
@@ -70,6 +78,7 @@
 	font-size: 1.2rem;
 	margin: 10px 0;
 	text-decoration: underline;
+	color: goldenrod;
 }
 
 .backBtn {

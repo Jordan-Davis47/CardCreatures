@@ -30,9 +30,19 @@ const Board = (props) => {
 
 	const checkForDirectAttackOnP2 = state.gamePhases.turn !== 1 && state.gamePhases.battlePhase && !state.player2.fieldSlots.fs1.isPlaying && !state.player2.fieldSlots.fs2.isPlaying && !state.player2.fieldSlots.fs3.isPlaying && !state.player2.isTurn;
 
+	let deck1Classes = classes.deck;
+	let deck2Classes = classes.deck2;
+	if (state.gamePhases.drawPhase) {
+		if (state.player1.isTurn) {
+			deck1Classes = `${classes.deck} ${classes.highlightDeck}`;
+		} else if (state.player2.isTurn && !state.aiPlaying) {
+			deck2Classes = `${classes.deck2} ${classes.highlightDeck}`;
+		}
+	}
+
 	return (
 		<div className={classes.board}>
-			<Tooltips />
+			{!showBattleLog && <Tooltips />}
 			<Button
 				className={classes.battleLogBtn}
 				onClick={() => {
@@ -74,7 +84,7 @@ const Board = (props) => {
 				<CardSlot className={classes.spellSlot} card={state.player1.trapSlots.ts1} getCardInfo={selectHandlers} isPlaying={state.player1.trapSlots.ts1.isPlaying} />
 				<CardSlot className={classes.spellSlot} card={state.player1.trapSlots.ts2} getCardInfo={selectHandlers} isPlaying={state.player1.trapSlots.ts2.isPlaying} />
 				<CardSlot className={classes.spellSlot} card={state.player1.trapSlots.ts3} getCardInfo={selectHandlers} isPlaying={state.player1.trapSlots.ts3.isPlaying} />
-				<CardSlot onClick={props.onDrawCard} className={classes.deck}>
+				<CardSlot onClick={props.onDrawCard} className={deck1Classes}>
 					{props.p1Deck.length}
 				</CardSlot>
 			</div>
@@ -83,7 +93,7 @@ const Board = (props) => {
 				<CardSlot className={classes.spellSlot} card={state.player2.trapSlots.ts1} getCardInfo={selectHandlers} isPlaying={state.player2.trapSlots.ts1.isPlaying} />
 				<CardSlot className={classes.spellSlot} card={state.player2.trapSlots.ts2} getCardInfo={selectHandlers} isPlaying={state.player2.trapSlots.ts2.isPlaying} />
 				<CardSlot className={classes.spellSlot} card={state.player2.trapSlots.ts3} getCardInfo={selectHandlers} isPlaying={state.player2.trapSlots.ts3.isPlaying} />
-				<CardSlot onClick={props.onDrawCard} className={classes.deck2}>
+				<CardSlot onClick={props.onDrawCard} className={deck2Classes}>
 					{props.p2Deck.length}
 				</CardSlot>
 			</div>

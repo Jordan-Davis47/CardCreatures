@@ -340,9 +340,8 @@ export const useAi = () => {
 				console.log("SET BATTLES ELSE BLOCK AI END TURN");
 				dispatch(playerActions.aiEndTurn());
 			}
-			// }, 1000);
 		}
-	}, [AiBattlePhase, dispatch, player1.fieldSlots, player2.fieldSlots, prevSelectedTarget, turnIsInProgress, hasAttackedLp, resetCurrentHandsAndFields]);
+	}, [AiBattlePhase, dispatch, player1.fieldSlots, player2.fieldSlots, prevSelectedTarget, turnIsInProgress, hasAttackedLp, resetCurrentHandsAndFields, currentp1Field, currentp2Field]);
 
 	useEffect(() => {
 		console.log("is battling use effect check start");
@@ -356,7 +355,6 @@ export const useAi = () => {
 				return;
 			}
 
-			// setTimeout(() => {
 			if (battles.length === 0 && !attackInProgress) {
 				console.log("BATTLE NUMBER USE EFFECT END TURN CHECK!");
 				setNumberOfBattles(false);
@@ -373,9 +371,7 @@ export const useAi = () => {
 			} else if (!attackInProgress && battles.length) {
 				console.log("BATTLE NUMBER USE EFFECT CHECK");
 				console.log("attacker:", battles[0].attacker, "defender:", battles[0].defender);
-				// if (!battles[0].attacker.hasAttacked) {
 				dispatch(playerActions.setAiAttackerDefender({ attacker: battles[0].attacker, defender: battles[0].defender }));
-				// }
 
 				const newBattles = battles.slice(1);
 				console.log(newBattles);
@@ -383,15 +379,8 @@ export const useAi = () => {
 				setNumberOfBattles((prevState) => prevState - 1);
 				setAttackInProgress(true);
 				setTrapIsActive(false);
-				// setHasAttackedLp(false);
 			}
-			// }, 1000);
-		} /*else if (!state.player1.isTurn && !trapIsActive && !attackInProgress) {
-			console.log("ELSE BRANCH AI END TURN");
-			console.log("ELSE BRANCH AI END TURN");
-			console.log("ELSE BRANCH AI END TURN");
-			dispatch(playerActions.aiEndTurn());
-		}*/
+		}
 	}, [numberOfBattles, battles, isBattling, dispatch, attackInProgress, state.attacker, state.defender, trapIsActive, state.player1.isTurn, state.player1.trapSlots, state.player2.trapSlots, turnIsInProgress, resetCurrentHandsAndFields]);
 
 	console.log("number of battles:", numberOfBattles, "battles:", battles);
@@ -410,9 +399,7 @@ export const useAi = () => {
 		const trapCards = checkForTrapCards();
 		console.log(trapCards);
 		if (trapCards) {
-			// setTimeout(() => {
 			setTrapCards(trapCards);
-			// }, 1000);
 		}
 
 		const monsterCard = chooseMonsterCard();

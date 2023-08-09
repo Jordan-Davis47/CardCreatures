@@ -25,6 +25,10 @@
 	cursor: pointer;
 }
 
+.card:hover {
+	transform: scale(1.02);
+}
+
 .name {
 	min-width: 90%;
 	max-width: 100%;
@@ -119,6 +123,7 @@
 	background-size: cover;
 	border: 2px solid goldenrod;
 	outline: 2px solid black;
+	cursor: pointer;
 }
 
 .faceDownCard img,
@@ -135,15 +140,6 @@
 	z-index: 1;
 	border: 2px solid goldenrod;
 }
-
-/* .faceDownCard::after {
-	content: "";
-	position: absolute;
-	width: 101%;
-	height: 101%;
-	background-color: rgb(158, 41, 41);
-	background-size: cover;
-} */
 
 .createDeckDisplayCard {
 	display: flex;

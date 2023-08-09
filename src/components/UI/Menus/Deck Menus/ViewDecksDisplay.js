@@ -106,7 +106,7 @@ const ViewDecksDisplay = (props) => {
 	return (
 		<div className={classes.display}>
 			<h2>{headerContent}</h2>
-			{props.forDuel && <p className={classes.message}>Decks must have at least 10 cards to be played</p>}
+			{props.forDuel && auth.isLoggedIn && <p className={classes.message}>Custom decks must have at least 10 cards to be played</p>}
 			<div className={classes.decksContainer}>
 				<ul onClick={highlightLi}>
 					{!props.createCard && !props.forDeletion && !props.forView && <p>Standard Decks</p>}

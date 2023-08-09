@@ -14,7 +14,9 @@ const MainHeader = (props) => {
 
 	return (
 		<div className={classes.header}>
-			<h1>Card Creatures</h1>
+			<h1>
+				Card Creatures<span>v1</span>
+			</h1>
 			{!auth.isLoggedIn && (
 				<Button className={classes.headerBtn} onClick={showAuthHandler}>
 					Login

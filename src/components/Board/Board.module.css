@@ -94,26 +94,46 @@
 	z-index: 1;
 }
 
+.deck,
+.deck2 {
+	cursor: pointer;
+	border: 2px solid goldenrod;
+}
+
 .deck {
 	align-self: flex-end;
 	margin: 0 0px 5px 5px;
-	cursor: pointer;
-}
-
-.deck:hover,
-.deck2:hover {
-	border: solid 1px white;
 }
 
 .deck2 {
 	align-self: flex-start;
-	cursor: pointer;
+}
+
+.deck::after,
+.deck2::after {
+	content: "";
+	margin: 0 auto;
+	width: 30px;
+	height: 70px;
+	background-color: black;
+	z-index: 1;
+	border: 2px solid goldenrod;
+}
+
+.deck:hover,
+.deck2:hover {
+	transform: scale(1.02);
 }
 
 .deck,
 .deck2 {
 	background-color: black;
 	color: white;
+}
+
+.highlightDeck {
+	box-shadow: 0 0 30px 10px goldenrod;
+	transition: box-shadow 0.5s ease-in;
 }
 
 .p1Life {
@@ -427,6 +447,6 @@
 
 	.p1BottomContainer,
 	.p2BottomContainer {
-		max-width: 80%;
+		max-width: 1180px;
 	}
 }
